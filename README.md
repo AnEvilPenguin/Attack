@@ -113,6 +113,7 @@ As a stretch goal we can consider keyboard/controller.
 - Piece selection and movement
 - Basic Piece combat
 - Full Piece implementation
+- Player Transition
 - Computer player
 - Full Art Assets
 
