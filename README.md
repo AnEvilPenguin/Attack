@@ -16,7 +16,7 @@ The game is developed to be released on Windows PC.
 ## Development Software
 
 - Godot
-- Asperite
+- Asperite/MS Paint
 - Visual Studio Community
 - SQL Lite
 
@@ -73,10 +73,12 @@ The game is over when a player has no more movable pieces or a flag is captured
 
 ## Art Style
 
-A minumal pixrl art style will be implemented.
+A minumal pixel art style will be implemented. This will mostly be left to the discrecion of the art director (Tom).
 
 Pieces will have art appropriate to the piece - the list of pieces can be adjusted (e.g. Sergeant becomes Infantry, Lieutenant becomes Tank, etc.).
 Initially the game will not have any background art, however this can be added later as a stretch goal.
+
+Piece art will need to have resolution defined (based on piece size in game), and a finalized list of pieces to implement.
 
 The game will have a main menu, with some room for basic styling.
 
