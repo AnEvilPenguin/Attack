@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://buj3tjpjgu6bf"]
+
+[ext_resource type="Script" path="res://MainMenu.cs" id="1_g4nv0"]
+
+[node name="Main Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_g4nv0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -171.0
+offset_right = 96.0
+offset_bottom = -10.0
+grow_vertical = 0
+
+[node name="ContinueButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../QuitButton")
+disabled = true
+text = "Continue"
+
+[node name="NewGameButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "New Game"
+
+[node name="LoadGameButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Load Game"
+
+[node name="OptionsButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Options"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../ContinueButton")
+text = "Quit"
+
+[connection signal="pressed" from="VBoxContainer/ContinueButton" to="." method="OnContinuePressed"]
+[connection signal="pressed" from="VBoxContainer/NewGameButton" to="." method="OnNewGamePressed"]
+[connection signal="pressed" from="VBoxContainer/LoadGameButton" to="." method="OnLoadGamePressed"]
+[connection signal="pressed" from="VBoxContainer/OptionsButton" to="." method="OnOptionsPressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="OnQuitPressed"]
