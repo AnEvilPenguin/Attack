@@ -32,6 +32,8 @@ public partial class MainMenu : Control
     public void OnOptionsPressed()
     {
         GD.Print("Options");
+
+        GetTree().ChangeSceneToFile("res://options.tscn");
     }
     public void OnQuitPressed()
     {
