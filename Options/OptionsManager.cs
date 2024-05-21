@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Attack.Util;
 using Godot;
 
 namespace Attack.Options
 {
     internal static class OptionsManager
     {
-        private static string _path = Path.Combine(
-            System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
-            "EvilPenguinIndustries\\Attack"
-        );
-
         private const string _fileName = "Settings.json";
 
         private static Options _options;
@@ -23,9 +19,6 @@ namespace Attack.Options
 
         static OptionsManager()
         {
-
-            Directory.CreateDirectory(_path);
-
             Load();
         }
 
@@ -36,14 +29,14 @@ namespace Attack.Options
         {
             string jsonString = JsonSerializer.Serialize(_options, _serializerOptions);
 
-            File.WriteAllTextAsync(Path.Combine(_path, _fileName), jsonString);
+            File.WriteAllTextAsync(Path.Combine(Constants.FolderPath, _fileName), jsonString);
         }
 
         public static void Load()
         {
             string jsonString = String.Empty;
 
-            var fullPath = Path.Combine(_path, _fileName);
+            var fullPath = Path.Combine(Constants.FolderPath, _fileName);
 
             if (File.Exists(fullPath))
             {
