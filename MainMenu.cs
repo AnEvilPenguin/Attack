@@ -1,3 +1,4 @@
+using Attack.Options;
 using Godot;
 using System;
 using System.Linq;
@@ -12,6 +13,8 @@ public partial class MainMenu : Control
             .OfType<Button>()
             .First(c => !c.Disabled)
             .GrabFocus();
+
+        OptionsManager.Load();
     }
 
     public void OnContinuePressed()
@@ -33,7 +36,7 @@ public partial class MainMenu : Control
     {
         GD.Print("Options");
 
-        GetTree().ChangeSceneToFile("res://options.tscn");
+        GetTree().ChangeSceneToFile("res://options_menu.tscn");
     }
     public void OnQuitPressed()
     {
