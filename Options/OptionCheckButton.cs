@@ -11,9 +11,9 @@ namespace Attack.Options
     {
         public OptionCheckButton(string text, Action pressed, bool selected)
         {
-            this.Text = text;
-            this.Pressed += pressed;
-            this.ButtonPressed = selected;
+            Text = text;
+            Pressed += pressed;
+            ButtonPressed = selected;
         }
     }
 }

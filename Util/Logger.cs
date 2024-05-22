@@ -1,5 +1,6 @@
 ﻿using Godot;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,8 @@ namespace Attack.Util
     {
         private static bool configured = false;
 
+        public static LoggingLevelSwitch LevelSwitch = new LoggingLevelSwitch();
+
         public override void _Ready()
         {
             if (!configured)
@@ -20,6 +23,7 @@ namespace Attack.Util
                 GetTree().AutoAcceptQuit = false;
 
                 Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.ControlledBy(LevelSwitch)
                     .WriteTo.Console()
                     .WriteTo.File(Path.Combine(Constants.FolderPath, "attack-.log"), rollingInterval: RollingInterval.Day)
                     .CreateLogger();

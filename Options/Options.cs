@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using Attack.Util;
 using Godot;
 using Serilog;
+using Serilog.Events;
 
 namespace Attack.Options
 {
     internal class Options
     {
         private bool _fullScreen = false;
+
         public bool FullScreen { 
             get => _fullScreen;
             set 
             {
-                Log.Debug($"Setting FullScreen to {value}");
+                logChange("FullScreen", value.ToString());
 
                 _fullScreen = value;
 
@@ -24,16 +27,48 @@ namespace Attack.Options
             }
         }
 
+        private LogEventLevel _logLevel = LogEventLevel.Information;
+        private string[] _logEventLevels = new string[]
+        {
+            "Error", "Warning", "Information", "Debug"
+        };
+
+        public LogEventLevel LogLevel
+        {
+            get => _logLevel;
+            set
+            {
+                logChange("LogLevel", value.ToString());
+                
+                _logLevel = value;
+
+                Logger.LevelSwitch.MinimumLevel = _logLevel;
+            }
+        }
+
         public Options() { }
 
-        public List<Button> GetButtons()
+        public List<Node> GetButtons()
         {
-            var buttons = new List<Button>();
+            var buttons = new List<Node>();
 
             buttons.Add(new OptionCheckButton("Fullscreen", () => FullScreen = !FullScreen, _fullScreen));
+
+            var logLabel = new Label() { Text = "Log Level" };
+            buttons.Add(logLabel);
+
+            var logButton = new OptionOptionButton(_logEventLevels, _logLevel.ToString());
+            logButton.ItemSelected += (long index) =>
+            {
+                var selectedItem = logButton.GetItemText((int)index);
+                LogLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), selectedItem, true);
+            };
+            buttons.Add(logButton);
 
             return buttons;
         }
 
+        private void logChange(string variableName, string variableValue) =>
+            Log.Debug($"Setting {variableName} to {variableValue}");
     }
 }

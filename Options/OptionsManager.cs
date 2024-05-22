@@ -23,7 +23,7 @@ namespace Attack.Options
             Load();
         }
 
-        public static List<Button> GetButtons() =>
+        public static List<Node> GetButtons() =>
             _options.GetButtons();
 
         public static void Save()
