@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using Attack.Util;
 using Godot;
+using Serilog;
 
 namespace Attack.Options
 {
@@ -27,6 +28,7 @@ namespace Attack.Options
 
         public static void Save()
         {
+            Log.Information("Saving Settings");
             string jsonString = JsonSerializer.Serialize(_options, _serializerOptions);
 
             File.WriteAllTextAsync(Path.Combine(Constants.FolderPath, _fileName), jsonString);
@@ -34,18 +36,23 @@ namespace Attack.Options
 
         public static void Load()
         {
+            Log.Debug("Loading Settings");
+
             string jsonString = String.Empty;
 
             var fullPath = Path.Combine(Constants.FolderPath, _fileName);
 
             if (File.Exists(fullPath))
             {
+                Log.Debug($"Loading settings from {fullPath}");
+
                 try
                 {
                     jsonString = File.ReadAllText(fullPath);
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.ToString());
                     GD.PrintErr(ex.ToString());
                 }
             }

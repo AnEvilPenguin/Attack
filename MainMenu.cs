@@ -1,5 +1,7 @@
 using Attack.Options;
+using Attack.Util;
 using Godot;
+using Serilog;
 using System;
 using System.Linq;
 
@@ -7,6 +9,7 @@ public partial class MainMenu : Control
 {
     public override void _Ready()
     {
+        Log.Information("Loading main menu");
         var container = GetNode<VBoxContainer>("VBoxContainer");
 
         container.GetChildren()
@@ -15,32 +18,34 @@ public partial class MainMenu : Control
             .GrabFocus();
 
         OptionsManager.Load();
+        Log.Debug("Main menu loaded");
     }
 
     public void OnContinuePressed()
     {
-        GD.Print("Continue");
+        Log.Debug("Continue");
     }
 
     public void OnLoadGamePressed()
     {
-        GD.Print("LoadGame");
+        Log.Debug("LoadGame");
     }
 
     public void OnNewGamePressed()
     {
-        GD.Print("NewGame");
+        Log.Debug("NewGame");
     }
 
     public void OnOptionsPressed()
     {
-        GD.Print("Options");
+        Log.Debug("Options");
 
         GetTree().ChangeSceneToFile("res://options_menu.tscn");
     }
     public void OnQuitPressed()
     {
-        GD.Print("Quit");
-        GetTree().Quit();
+        Log.Information("Quitting via button");
+
+        GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
     }
 }

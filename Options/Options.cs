@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
+using Serilog;
 
 namespace Attack.Options
 {
@@ -11,6 +12,8 @@ namespace Attack.Options
             get => _fullScreen;
             set 
             {
+                Log.Debug($"Setting FullScreen to {value}");
+
                 _fullScreen = value;
 
                 var mode = _fullScreen ?
