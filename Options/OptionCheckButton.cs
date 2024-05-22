@@ -9,9 +9,8 @@ namespace Attack.Options
 {
     internal partial class OptionCheckButton: CheckButton
     {
-        public OptionCheckButton(string text, Action pressed, bool selected)
+        public OptionCheckButton(Action pressed, bool selected)
         {
-            Text = text;
             Pressed += pressed;
             ButtonPressed = selected;
         }

@@ -50,12 +50,12 @@ namespace Attack.Options
 
         public List<Node> GetButtons()
         {
-            var buttons = new List<Node>();
-
-            buttons.Add(new OptionCheckButton("Fullscreen", () => FullScreen = !FullScreen, _fullScreen));
-
-            var logLabel = new Label() { Text = "Log Level" };
-            buttons.Add(logLabel);
+            var buttons = new List<Node>()
+            {
+                new Label() { Text = "Fullscreen" },
+                new OptionCheckButton(() => FullScreen = !FullScreen, _fullScreen),
+                new Label() { Text = "Log Level" }
+            };
 
             var logButton = new OptionOptionButton(_logEventLevels, _logLevel.ToString());
             logButton.ItemSelected += (long index) =>
@@ -63,6 +63,7 @@ namespace Attack.Options
                 var selectedItem = logButton.GetItemText((int)index);
                 LogLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), selectedItem, true);
             };
+
             buttons.Add(logButton);
 
             return buttons;

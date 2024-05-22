@@ -9,7 +9,7 @@ public partial class OptionsMenu : Control
 	public override void _Ready()
 	{
 		Log.Information("Options Menu");
-		var optionsContainer = GetNode<VBoxContainer>("VBoxContainer");
+		var optionsContainer = GetNode<GridContainer>("OptionsContainer");
 
         foreach (var button in OptionsManager.GetButtons())
         {
