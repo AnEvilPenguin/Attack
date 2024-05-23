@@ -1,0 +1,36 @@
+[gd_scene load_steps=9 format=3 uid="uid://crqa7iapulfxs"]
+
+[ext_resource type="Texture2D" uid="uid://obvvwb336lyl" path="res://Art/Background.png" id="1_bv52g"]
+[ext_resource type="Texture2D" uid="uid://rtf5pyspuqwi" path="res://Art/Border.png" id="2_xqsm1"]
+[ext_resource type="Script" path="res://BoardMap.cs" id="3_1awpp"]
+[ext_resource type="Texture2D" uid="uid://c5573ub011jod" path="res://Art/Hover.png" id="3_5hmta"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qq3av"]
+texture = ExtResource("1_bv52g")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ism81"]
+texture = ExtResource("2_xqsm1")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w640q"]
+texture = ExtResource("3_5hmta")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_1yejn"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_qq3av")
+sources/1 = SubResource("TileSetAtlasSource_ism81")
+sources/2 = SubResource("TileSetAtlasSource_w640q")
+
+[node name="Board" type="Node2D"]
+
+[node name="BoardMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_1yejn")
+rendering_quadrant_size = 10
+format = 2
+layer_1/tile_data = PackedInt32Array()
+script = ExtResource("3_1awpp")
