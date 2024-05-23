@@ -34,6 +34,8 @@ public partial class MainMenu : Control
     public void OnNewGamePressed()
     {
         Log.Debug("NewGame");
+
+        GetTree().ChangeSceneToFile("res://game.tscn");
     }
 
     public void OnOptionsPressed()

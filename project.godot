@@ -21,6 +21,7 @@ Logger="*res://Util/Logger.cs"
 
 [display]
 
+window/size/viewport_height=864
 window/stretch/mode="viewport"
 
 [dotnet]
