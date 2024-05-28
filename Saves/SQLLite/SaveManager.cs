@@ -86,8 +86,12 @@ namespace Attack.Saves.SQLLite
             _saveGame = new SaveGame(_connectionString);
         }
 
-        public GameInstance NewGame()
-            => _saveGame.Create();
+        public GameInstance NewGame() =>
+            _saveGame.Create();
+        
+        public void SaveGame(GameInstance game) =>
+            _saveGame.Save(game);
+
 
         public void Initialize()
         {

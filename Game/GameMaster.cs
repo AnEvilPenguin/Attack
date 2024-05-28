@@ -47,8 +47,7 @@ namespace Attack.Game
                 Log.Error(ex, "Failed to create new game");
             }
 
-            _gameInstance.Player1 = "Hugh Mann";
-            _gameInstance.Player2 = "Robot Louis Stephenson";
+            _sqlSaveManager.SaveGame(_gameInstance);
         }
 
         // NewGame

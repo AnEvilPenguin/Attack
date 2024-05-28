@@ -10,6 +10,8 @@ namespace Attack.Util
             "EvilPenguinIndustries\\Attack"
         );
 
+        public const string DateStringFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK";
+
         static Constants()
         {
             Directory.CreateDirectory(FolderPath);

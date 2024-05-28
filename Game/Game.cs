@@ -9,12 +9,14 @@ namespace Attack.Game
 {
     internal class GameInstance
     {
-        private DateTime _startDate;
-        private DateTime _completedDate;
+        public DateTime? StartDate;
+        public DateTime? CompletedDate;
 
         public int Id;
 
-        public string Player1;
-        public string Player2;
+        public string Player1 = "Hugh Mann";
+        public string Player2 = "Robot Louis Stevenson";
+
+        public string SaveName = $"Auto {DateTime.Now:f}";
     }
 }
