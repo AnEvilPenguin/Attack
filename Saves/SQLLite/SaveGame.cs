@@ -42,9 +42,34 @@ namespace Attack.Saves.SQLLite
             return instance;
         }
 
-        public void Delete(int id)
+        public void Delete(GameInstance game)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        DELETE FROM Games
+                        WHERE Id = $Id
+                    ";
+
+                command.Parameters.AddWithValue("$Id", game.Id);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+
+                    Log.Debug($"Successfully deleted game {game.Id}");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Failed to delete game {game.Id}");
+                    throw;
+                }
+            }
         }
 
         public GameInstance Load(int id)

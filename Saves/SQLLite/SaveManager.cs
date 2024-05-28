@@ -92,6 +92,9 @@ namespace Attack.Saves.SQLLite
         public void SaveGame(GameInstance game) =>
             _saveGame.Save(game);
 
+        public void DeleteGame(GameInstance game) =>
+            _saveGame.Delete(game);
+
 
         public void Initialize()
         {
