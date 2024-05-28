@@ -24,7 +24,6 @@ namespace Attack.Util
 
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.ControlledBy(LevelSwitch)
-                    .WriteTo.Console()
                     .WriteTo.File(Path.Combine(Constants.FolderPath, "attack-.log"), rollingInterval: RollingInterval.Day)
                     .CreateLogger();
 
