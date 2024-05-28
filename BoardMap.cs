@@ -49,7 +49,7 @@ public partial class BoardMap : TileMap
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		tiles.ForEach(t => EraseCell(1, t.Position));
+		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
