@@ -5,6 +5,13 @@ using System.Collections.Generic;
 
 public partial class BoardMap : TileMap
 {
+	private enum MapLayer
+	{
+		Background,
+		Pieces,
+		Overlay
+	}
+
 	int GridSize = 12;
 
 	List<Tile> tiles = new List<Tile>();
@@ -21,16 +28,17 @@ public partial class BoardMap : TileMap
 		{
 			for (int j = 0; j < GridSize; j++)
 			{
-				int tileId = 0;
+				TileType tileId = TileType.Terrain;
 
 				if (i == 0 || j == 0 || i == GridSize - 1 || j == GridSize - 1)
-					tileId = 1;
+					tileId = TileType.Border;
 
 				var location = new Vector2I(i, j);
 
-				SetCell(0, location, tileId, new Vector2I(0,0), 0);
+				SetCell((int)MapLayer.Background, location, (int)tileId, new Vector2I(0,0), 0);
 
-				var tile = new Tile(location, tileId);
+				var tile = new Tile(location);
+				tile.Type = tileId;
 
                 tiles.Add(tile);
 				lookup.Add(location, tile);
@@ -50,8 +58,8 @@ public partial class BoardMap : TileMap
 		{
 			var tile = lookup[mapLocation];
 
-			if (tile.Type != 1)
-				SetCell(1, mapLocation, 2, new Vector2I(0,0), 0);
+			if (tile.Type != TileType.Border)
+				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
 		}
 	}
 }
