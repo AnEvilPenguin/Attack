@@ -74,7 +74,56 @@ namespace Attack.Saves.SQLLite
 
         public GameInstance Load(int id)
         {
-            throw new NotImplementedException();
+            GameInstance instance = new GameInstance();
+            SqliteDataReader reader;
+
+            using (var connection = new SqliteConnection( _connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        SELECT * FROM Games
+                        WHERE Id = $Id
+                    ";
+
+                command.Parameters.AddWithValue("$Id", id);
+
+                reader = command.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    string message = $"No records with Id {id}";
+
+                    Log.Error(message);
+                    throw new IndexOutOfRangeException(message);
+                }
+
+                while (reader.Read())
+                {
+                    instance.Id = (int)(long)reader.GetValue(0);
+
+                    instance.SaveName = (string)reader.GetValue(1);
+                    instance.Player1 = (string)reader.GetValue(2);
+                    instance.Player2 = (string)reader.GetValue(3);
+
+                    instance.UpdateDate = DateTime.Parse((string)reader.GetValue(5));
+
+                    var startDate = reader.GetValue(4);
+
+                    if (startDate is not DBNull)
+                        instance.StartDate = DateTime.Parse(startDate.ToString());
+
+                    var endDate = reader.GetValue(6);
+
+                    if (endDate is not DBNull)
+                        instance.CompletedDate = DateTime.Parse(endDate.ToString());
+                }
+            }
+
+            return instance;
         }
 
         public void Save(GameInstance game)

@@ -11,6 +11,7 @@ namespace Attack.Game
     {
         public DateTime? StartDate;
         public DateTime? CompletedDate;
+        public DateTime? UpdateDate;
 
         public int Id;
 
