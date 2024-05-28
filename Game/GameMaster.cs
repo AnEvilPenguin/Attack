@@ -1,4 +1,4 @@
-﻿using Attack.Saves;
+﻿using Attack.Saves.SQLLite;
 using Godot;
 using Serilog;
 using System;
@@ -16,8 +16,9 @@ namespace Attack.Game
         // private stack previous turns
         // private stack replayed
 
-        private static SQLLiteSaveManager _sqlSaveManager;
+        private static SaveManager _sqlSaveManager;
 
+        private static GameInstance _gameInstance;
 
         public override void _Ready()
         {
@@ -27,12 +28,27 @@ namespace Attack.Game
 
             // Connect/Create Database
 
-            _sqlSaveManager = new SQLLiteSaveManager();
+            _sqlSaveManager = new SaveManager();
             _sqlSaveManager.Initialize();
 
             _initialized = true;
 
             Log.Debug("Game Master Initialized");
+        }
+
+        public static void New()
+        {
+            try
+            {
+                _gameInstance = _sqlSaveManager.NewGame();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to create new game");
+            }
+
+            _gameInstance.Player1 = "Hugh Mann";
+            _gameInstance.Player2 = "Robot Louis Stephenson";
         }
 
         // NewGame

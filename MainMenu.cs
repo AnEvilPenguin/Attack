@@ -1,3 +1,4 @@
+using Attack.Game;
 using Attack.Options;
 using Attack.Util;
 using Godot;
@@ -34,6 +35,8 @@ public partial class MainMenu : Control
     public void OnNewGamePressed()
     {
         Log.Debug("NewGame");
+
+        GameMaster.New();
 
         GetTree().ChangeSceneToFile("res://game.tscn");
     }

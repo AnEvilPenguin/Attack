@@ -8,24 +8,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using Attack.Game;
 
-namespace Attack.Saves
+namespace Attack.Saves.SQLLite
 {
-    internal class SQLLiteSaveManager
+    internal class SaveManager
     {
         private readonly string _databasePath = $"{Constants.FolderPath}\\saves.db";
+        private readonly string _connectionString;
 
         private const string createGamesTableCommand =
             @"
                     CREATE TABLE 'Games' (
-	                    'Id'	        INTEGER NOT NULL,
+	                    'Id'	        INTEGER,
 	                    'SaveName'	    TEXT,
 	                    'Player1Name'	TEXT,
 	                    'Player2Name'	TEXT,
 	                    'StartDate'	    TEXT,
 	                    'UpdateDate'	TEXT,
 	                    'CompletedDate'	TEXT,
-	                    'Version'	    INTEGER NOT NULL,
+	                    'Version'	    INTEGER NOT NULL DEFAULT 1,
 	                    PRIMARY KEY('Id' AUTOINCREMENT)
                     );
             ";
@@ -74,10 +76,18 @@ namespace Attack.Saves
                 );
             ";
 
-        public SQLLiteSaveManager()
+        private SaveGame _saveGame;
+
+        public SaveManager()
         {
             Log.Debug("SqlLiteSaveManager Constructed");
+            _connectionString = $"Data Source={_databasePath}";
+
+            _saveGame = new SaveGame(_connectionString);
         }
+
+        public GameInstance NewGame()
+            => _saveGame.Create();
 
         public void Initialize()
         {
@@ -91,7 +101,7 @@ namespace Attack.Saves
                 return;
             }
 
-            using (var connection = new SqliteConnection($"Data Source={_databasePath}"))
+            using (var connection = new SqliteConnection(_connectionString))
             {
                 Log.Debug("Connecting to database");
                 connection.Open();
