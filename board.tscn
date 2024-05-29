@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://crqa7iapulfxs"]
+[gd_scene load_steps=10 format=3 uid="uid://crqa7iapulfxs"]
 
 [ext_resource type="Texture2D" uid="uid://obvvwb336lyl" path="res://Art/Background.png" id="1_bv52g"]
 [ext_resource type="Texture2D" uid="uid://rtf5pyspuqwi" path="res://Art/Border.png" id="2_xqsm1"]
 [ext_resource type="Script" path="res://BoardMap.cs" id="3_1awpp"]
 [ext_resource type="Texture2D" uid="uid://c5573ub011jod" path="res://Art/Hover.png" id="3_5hmta"]
+[ext_resource type="PackedScene" uid="uid://b22v5bsqs6oqx" path="res://piece_node.tscn" id="5_ri4g5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w640q"]
 texture = ExtResource("3_5hmta")
@@ -38,3 +39,4 @@ layer_1/tile_data = PackedInt32Array()
 layer_2/name = "Overlay"
 layer_2/tile_data = PackedInt32Array()
 script = ExtResource("3_1awpp")
+PieceScene = ExtResource("5_ri4g5")

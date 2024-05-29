@@ -12,6 +12,9 @@ public partial class BoardMap : TileMap
 		Overlay
 	}
 
+	[Export]
+	public PackedScene PieceScene { get; set; }
+
 	int GridSize = 12;
 
 	List<Tile> tiles = new List<Tile>();
@@ -37,7 +40,7 @@ public partial class BoardMap : TileMap
 
 				SetCell((int)MapLayer.Background, location, (int)tileId, new Vector2I(0,0), 0);
 
-				var tile = new Tile(location);
+				var tile = new Tile(location, MapToLocal(location));
 				tile.Type = tileId;
 
                 tiles.Add(tile);
@@ -60,6 +63,24 @@ public partial class BoardMap : TileMap
 
 			if (tile.Type != TileType.Border)
 				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
+		}
+
+		if(Input.IsActionJustPressed("MouseClick"))
+		{
+			// TODO figure out if we should be placing pieces or not.
+
+            Tile tile;
+            lookup.TryGetValue(mapLocation, out tile);
+
+			if(tile.Type == TileType.Terrain)
+			{
+                PieceNode piece = PieceScene.Instantiate<PieceNode>();
+                AddChild(piece);
+
+                piece.PieceType = PieceType.Liutenant;
+
+                tile.AddPiece(piece);
+            }
 		}
 	}
 }
