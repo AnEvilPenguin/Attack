@@ -36,7 +36,7 @@ namespace Attack.Game
             Log.Debug("Game Master Initialized");
         }
 
-        public static void New()
+        public void New()
         {
             try
             {
@@ -48,6 +48,9 @@ namespace Attack.Game
             }
 
             _sqlSaveManager.SaveGame(_gameInstance);
+
+            GetTree().ChangeSceneToFile("res://game.tscn");
+            // Load up specific starting pieces?
         }
 
         // NewGame

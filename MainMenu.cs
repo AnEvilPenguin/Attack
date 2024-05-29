@@ -8,6 +8,8 @@ using System.Linq;
 
 public partial class MainMenu : Control
 {
+    private GameMaster _gameMaster;
+
     public override void _Ready()
     {
         Log.Information("Loading main menu");
@@ -20,6 +22,8 @@ public partial class MainMenu : Control
 
         OptionsManager.Load();
         Log.Debug("Main menu loaded");
+
+        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
     }
 
     public void OnContinuePressed()
@@ -36,9 +40,7 @@ public partial class MainMenu : Control
     {
         Log.Debug("NewGame");
 
-        GameMaster.New();
-
-        GetTree().ChangeSceneToFile("res://game.tscn");
+        _gameMaster.New();
     }
 
     public void OnOptionsPressed()
