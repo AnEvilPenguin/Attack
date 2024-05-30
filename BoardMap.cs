@@ -1,5 +1,6 @@
 using Attack.Game;
 using Godot;
+using Serilog;
 using System;
 using System.Collections.Generic;
 
@@ -21,6 +22,26 @@ public partial class BoardMap : TileMap
 	Dictionary<Vector2I, Tile> lookup = new Dictionary<Vector2I, Tile>();
 
 	private Vector2 _offset;
+
+	private GameMaster _gameMaster;
+
+	internal void createPiece(Vector2I location, PieceType type, Team team)
+	{
+		Tile tile;
+
+		Log.Debug($"Adding {type} to {location} for {team}");
+
+		// TODO Some error handling?
+        lookup.TryGetValue(location, out tile);
+
+        PieceNode piece = PieceScene.Instantiate<PieceNode>();
+        AddChild(piece);
+
+		piece.Team = team;
+		piece.PieceType = type;
+
+        tile.AddPiece(piece);
+    }
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -47,6 +68,10 @@ public partial class BoardMap : TileMap
 				lookup.Add(location, tile);
 			}
 		}
+
+        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
+
+		_gameMaster.CreateGame(this);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -20,6 +20,10 @@ namespace Attack.Game
 
         private static GameInstance _gameInstance;
 
+        public bool GameStarted = false;
+
+        private static BoardMap _board;
+
         public override void _Ready()
         {
             if (_initialized) return;
@@ -50,7 +54,19 @@ namespace Attack.Game
             _sqlSaveManager.SaveGame(_gameInstance);
 
             GetTree().ChangeSceneToFile("res://game.tscn");
-            // Load up specific starting pieces?
+        }
+
+        public void CreateGame(BoardMap board)
+        {
+            _board = board;
+
+            foreach (var pieceConfig in Presets.StandardSetup.Locations)
+            {
+                var location = pieceConfig.Item1;
+                var pieceType = pieceConfig.Item2;
+
+                _board.createPiece(location, pieceType, Team.Red);
+            }
         }
 
         // NewGame
