@@ -95,7 +95,8 @@ public partial class BoardMap : TileMap
 			// TODO figure out if we should be placing pieces or not.
 
             Tile tile;
-            lookup.TryGetValue(mapLocation, out tile);
+			if (!lookup.TryGetValue(mapLocation, out tile))
+				return;
 
 			if(tile.Type == TileType.Terrain)
 			{

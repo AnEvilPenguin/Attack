@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://lwuojubh0aus"]
+
+[ext_resource type="Script" path="res://PieceSelector.cs" id="1_ofg0r"]
+
+[node name="PieceSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ofg0r")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Landmine" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Landmine (6)"
+
+[node name="Spy" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Spy (1)"
+
+[node name="Scout" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Scout (8)"
+
+[node name="Engineer" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Engineer (5)"
+
+[node name="Sergeant" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Sergeant (4)"
+
+[node name="Lieutenant" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Lieutenant (4)"
+
+[node name="Captain" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Captain (4)"
+
+[node name="Commandant" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Commandant (2)"
+
+[node name="Colonel" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Colonel (2)"
+
+[node name="Brigadier General" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Brigadier General (1)"
+
+[node name="Commander-in-chief" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Commander-in-chief (1)"
+
+[node name="Flag" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Flag (1)"
+
+[connection signal="pressed" from="VBoxContainer/Landmine" to="." method="OnButtonPressed" binds= [0]]
+[connection signal="pressed" from="VBoxContainer/Spy" to="." method="OnButtonPressed" binds= [1]]
+[connection signal="pressed" from="VBoxContainer/Scout" to="." method="OnButtonPressed" binds= [2]]
+[connection signal="pressed" from="VBoxContainer/Engineer" to="." method="OnButtonPressed" binds= [3]]
+[connection signal="pressed" from="VBoxContainer/Sergeant" to="." method="OnButtonPressed" binds= [4]]
+[connection signal="pressed" from="VBoxContainer/Lieutenant" to="." method="OnButtonPressed" binds= [5]]
+[connection signal="pressed" from="VBoxContainer/Captain" to="." method="OnButtonPressed" binds= [6]]
+[connection signal="pressed" from="VBoxContainer/Commandant" to="." method="OnButtonPressed" binds= [7]]
+[connection signal="pressed" from="VBoxContainer/Colonel" to="." method="OnButtonPressed" binds= [8]]
+[connection signal="pressed" from="VBoxContainer/Brigadier General" to="." method="OnButtonPressed" binds= [9]]
+[connection signal="pressed" from="VBoxContainer/Flag" to="." method="OnButtonPressed" binds= [11]]

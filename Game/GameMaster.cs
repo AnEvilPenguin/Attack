@@ -11,18 +11,23 @@ namespace Attack.Game
 {
     internal partial class GameMaster : Node
     {
-        private static bool _initialized = false;
+        private bool _initialized = false;
 
         // private stack previous turns
         // private stack replayed
 
-        private static SaveManager _sqlSaveManager;
+        private SaveManager _sqlSaveManager;
 
-        private static GameInstance _gameInstance;
+        private GameInstance _gameInstance;
 
         public bool GameStarted = false;
 
-        private static BoardMap _board;
+        private BoardMap _board;
+
+        private Dictionary<PieceType, int> _pieceLimits;
+        private Dictionary<PieceType, int> _playerPieceCount;
+
+        public PieceType SelectedPieceType;
 
         public override void _Ready()
         {
@@ -54,6 +59,38 @@ namespace Attack.Game
             _sqlSaveManager.SaveGame(_gameInstance);
 
             GetTree().ChangeSceneToFile("res://game.tscn");
+
+            _pieceLimits = new Dictionary<PieceType, int> 
+            {
+                { PieceType.Landmine, 6 },
+                { PieceType.Spy, 1 },
+                { PieceType.Scout, 8 },
+                { PieceType.Engineer, 5 },
+                { PieceType.Sergeant, 4 },
+                { PieceType.Liutenant, 4 },
+                { PieceType.Captain, 4 },
+                { PieceType.Commandant, 2 },
+                { PieceType.Colonel, 2 },
+                { PieceType.BrigadierGeneral, 1 },
+                { PieceType.CommanderInChief, 1 },
+                { PieceType.Flag, 1 },
+            };
+
+            _playerPieceCount = new Dictionary<PieceType, int>
+            {
+                { PieceType.Landmine, 0 },
+                { PieceType.Spy, 0 },
+                { PieceType.Scout, 0 },
+                { PieceType.Engineer, 0 },
+                { PieceType.Sergeant, 0 },
+                { PieceType.Liutenant, 0 },
+                { PieceType.Captain, 0 },
+                { PieceType.Commandant, 0 },
+                { PieceType.Colonel, 0 },
+                { PieceType.BrigadierGeneral, 0 },
+                { PieceType.CommanderInChief, 0 },
+                { PieceType.Flag, 0 },
+            };
         }
 
         public void CreateGame(BoardMap board)
