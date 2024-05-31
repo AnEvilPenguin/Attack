@@ -105,6 +105,11 @@ namespace Attack.Game
         public void RemovePiece(PieceType type) =>
             _playerPieceCount[type]--;
 
+        public bool IsPlacementComplete() =>
+            !_playerPieceCount
+                .Keys
+                .Any(k => _playerPieceCount[k] != Constants.PieceLimits[k]);
+
         // NewGame
         // create new game
         // create teams?

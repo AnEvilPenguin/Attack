@@ -19,7 +19,7 @@ public partial class PieceSelector : Control
     private Button _commanderInChiefButton;
     private Button _flagButton;
 
-
+    private Button _startButton;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -38,7 +38,9 @@ public partial class PieceSelector : Control
         _brigadierGeneralButton = GetNode<Button>("VBoxContainer/BrigadierGeneral");
         _commanderInChiefButton = GetNode<Button>("VBoxContainer/CommanderInChief");
         _flagButton = GetNode<Button>("VBoxContainer/Flag");
-}
+
+        _startButton = GetNode<Button>("VBoxContainer/StartGame");
+    }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
@@ -59,6 +61,12 @@ public partial class PieceSelector : Control
         _brigadierGeneralButton.Text = $"Brigadier General ({_gameMaster.GetPieceCount(PieceType.BrigadierGeneral)})";
         _commanderInChiefButton.Text = $"Commander-in-chief ({_gameMaster.GetPieceCount(PieceType.CommanderInChief)})";
         _flagButton.Text = $"Flag ({_gameMaster.GetPieceCount(PieceType.Flag)})";
+
+        if (_gameMaster.IsPlacementComplete())
+        {
+            _startButton.Disabled = false;
+        }
+
     }
 
     public void OnButtonPressed(int id)
