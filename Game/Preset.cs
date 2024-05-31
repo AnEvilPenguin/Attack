@@ -16,6 +16,8 @@ namespace Attack.Game
         public List<Tuple<Vector2I, PieceType>> Locations;
     }
 
+    // FIXME move to JSON file or something?
+    // Should implement random (semi-random?) placement?
     internal static class Presets
     {
         public static Preset StandardSetup = new Preset()
@@ -44,7 +46,7 @@ namespace Attack.Game
                 new Tuple<Vector2I, PieceType>(new Vector2I(7,2), PieceType.Colonel),
                 new Tuple<Vector2I, PieceType>(new Vector2I(8,2), PieceType.Engineer),
                 new Tuple<Vector2I, PieceType>(new Vector2I(9,2), PieceType.Sergeant),
-                new Tuple<Vector2I, PieceType>(new Vector2I(10,2), PieceType.Liutenant),
+                new Tuple<Vector2I, PieceType>(new Vector2I(10,2), PieceType.Lieutenant),
 
                 new Tuple<Vector2I, PieceType>(new Vector2I(1,3), PieceType.Landmine),
                 new Tuple<Vector2I, PieceType>(new Vector2I(2,3), PieceType.Sergeant),

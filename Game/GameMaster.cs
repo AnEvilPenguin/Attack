@@ -67,7 +67,7 @@ namespace Attack.Game
                 { PieceType.Scout, 8 },
                 { PieceType.Engineer, 5 },
                 { PieceType.Sergeant, 4 },
-                { PieceType.Liutenant, 4 },
+                { PieceType.Lieutenant, 4 },
                 { PieceType.Captain, 4 },
                 { PieceType.Commandant, 2 },
                 { PieceType.Colonel, 2 },
@@ -83,7 +83,7 @@ namespace Attack.Game
                 { PieceType.Scout, 0 },
                 { PieceType.Engineer, 0 },
                 { PieceType.Sergeant, 0 },
-                { PieceType.Liutenant, 0 },
+                { PieceType.Lieutenant, 0 },
                 { PieceType.Captain, 0 },
                 { PieceType.Commandant, 0 },
                 { PieceType.Colonel, 0 },
@@ -105,6 +105,15 @@ namespace Attack.Game
                 _board.createPiece(location, pieceType, Team.Red);
             }
         }
+
+        public int GetPieceCount(PieceType pieceType) =>
+            _pieceLimits[pieceType] - _playerPieceCount[pieceType];
+
+        public bool IsPiecePlaceable() =>
+            _playerPieceCount[SelectedPieceType] < _pieceLimits[SelectedPieceType];
+
+        public void AssignPiece() =>
+            _playerPieceCount[SelectedPieceType]++;
 
         // NewGame
         // create new game

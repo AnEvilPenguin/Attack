@@ -53,11 +53,11 @@ text = "Commandant (2)"
 layout_mode = 2
 text = "Colonel (2)"
 
-[node name="Brigadier General" type="Button" parent="VBoxContainer"]
+[node name="BrigadierGeneral" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Brigadier General (1)"
 
-[node name="Commander-in-chief" type="Button" parent="VBoxContainer"]
+[node name="CommanderInChief" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Commander-in-chief (1)"
 
@@ -74,5 +74,6 @@ text = "Flag (1)"
 [connection signal="pressed" from="VBoxContainer/Captain" to="." method="OnButtonPressed" binds= [6]]
 [connection signal="pressed" from="VBoxContainer/Commandant" to="." method="OnButtonPressed" binds= [7]]
 [connection signal="pressed" from="VBoxContainer/Colonel" to="." method="OnButtonPressed" binds= [8]]
-[connection signal="pressed" from="VBoxContainer/Brigadier General" to="." method="OnButtonPressed" binds= [9]]
+[connection signal="pressed" from="VBoxContainer/BrigadierGeneral" to="." method="OnButtonPressed" binds= [9]]
+[connection signal="pressed" from="VBoxContainer/CommanderInChief" to="." method="OnButtonPressed" binds= [10]]
 [connection signal="pressed" from="VBoxContainer/Flag" to="." method="OnButtonPressed" binds= [11]]

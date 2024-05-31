@@ -98,14 +98,15 @@ public partial class BoardMap : TileMap
 			if (!lookup.TryGetValue(mapLocation, out tile))
 				return;
 
-			if(tile.Type == TileType.Terrain)
+			if(tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.Type == TileType.Terrain)
 			{
                 PieceNode piece = PieceScene.Instantiate<PieceNode>();
                 AddChild(piece);
 
-                piece.PieceType = PieceType.Liutenant;
+                piece.PieceType = _gameMaster.SelectedPieceType;
 
                 tile.AddPiece(piece);
+				_gameMaster.AssignPiece();
             }
 		}
 	}

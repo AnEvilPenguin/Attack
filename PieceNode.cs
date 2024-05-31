@@ -8,7 +8,7 @@ internal enum PieceType // Interface Terrain?
     Scout,
     Engineer,
     Sergeant,
-    Liutenant,
+    Lieutenant,
     Captain,
     Commandant,
     Colonel,
