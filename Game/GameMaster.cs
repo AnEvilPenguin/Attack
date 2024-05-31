@@ -1,4 +1,5 @@
 ﻿using Attack.Saves.SQLLite;
+using Attack.Util;
 using Godot;
 using Serilog;
 using System;
@@ -24,7 +25,6 @@ namespace Attack.Game
 
         private BoardMap _board;
 
-        private Dictionary<PieceType, int> _pieceLimits;
         private Dictionary<PieceType, int> _playerPieceCount;
 
         public PieceType SelectedPieceType;
@@ -60,22 +60,6 @@ namespace Attack.Game
 
             GetTree().ChangeSceneToFile("res://game.tscn");
 
-            _pieceLimits = new Dictionary<PieceType, int> 
-            {
-                { PieceType.Landmine, 6 },
-                { PieceType.Spy, 1 },
-                { PieceType.Scout, 8 },
-                { PieceType.Engineer, 5 },
-                { PieceType.Sergeant, 4 },
-                { PieceType.Lieutenant, 4 },
-                { PieceType.Captain, 4 },
-                { PieceType.Commandant, 2 },
-                { PieceType.Colonel, 2 },
-                { PieceType.BrigadierGeneral, 1 },
-                { PieceType.CommanderInChief, 1 },
-                { PieceType.Flag, 1 },
-            };
-
             _playerPieceCount = new Dictionary<PieceType, int>
             {
                 { PieceType.Landmine, 0 },
@@ -107,13 +91,19 @@ namespace Attack.Game
         }
 
         public int GetPieceCount(PieceType pieceType) =>
-            _pieceLimits[pieceType] - _playerPieceCount[pieceType];
+            Constants.PieceLimits[pieceType] - _playerPieceCount[pieceType];
 
         public bool IsPiecePlaceable() =>
-            _playerPieceCount[SelectedPieceType] < _pieceLimits[SelectedPieceType];
+            _playerPieceCount[SelectedPieceType] < Constants.PieceLimits[SelectedPieceType];
+
+        public bool IsPieceRemovable(PieceType type) =>
+            _playerPieceCount[type] > 0;
 
         public void AssignPiece() =>
             _playerPieceCount[SelectedPieceType]++;
+
+        public void RemovePiece(PieceType type) =>
+            _playerPieceCount[type]--;
 
         // NewGame
         // create new game

@@ -24,6 +24,7 @@ namespace Attack.Game
         {
             Name = "Standard",
             Description = "A basic example setup",
+            // FIXME some sort of verification against piece limits?
             Locations = new List<Tuple<Vector2I, PieceType>>
             {
                 new Tuple<Vector2I, PieceType>(new Vector2I(1,1), PieceType.Landmine),

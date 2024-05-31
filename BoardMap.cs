@@ -90,24 +90,46 @@ public partial class BoardMap : TileMap
 				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
 		}
 
-		if(Input.IsActionJustPressed("MouseClick"))
+		if (Input.IsActionJustPressed("MouseClick"))
 		{
-			// TODO figure out if we should be placing pieces or not.
-
-            Tile tile;
-			if (!lookup.TryGetValue(mapLocation, out tile))
+			if (!lookup.TryGetValue(mapLocation, out Tile tile))
 				return;
 
-			if(tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.Type == TileType.Terrain)
+			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.Type == TileType.Terrain)
 			{
                 PieceNode piece = PieceScene.Instantiate<PieceNode>();
                 AddChild(piece);
 
                 piece.PieceType = _gameMaster.SelectedPieceType;
+				piece.Team = Team.Blue;
 
                 tile.AddPiece(piece);
 				_gameMaster.AssignPiece();
             }
 		}
+
+		if (Input.IsActionJustPressed("RightClick"))
+		{
+            if (!lookup.TryGetValue(mapLocation, out Tile tile))
+                return;
+
+            if (!tile.IsEmpty() && tile.Piece.Team == Team.Blue)
+			{
+				var piece = tile.Piece;
+
+                if (_gameMaster.IsPieceRemovable(piece.PieceType))
+				{
+                    tile.RemovePiece();
+                    _gameMaster.RemovePiece(piece.PieceType);
+
+                    piece.QueueFree();
+                }
+				else
+				{
+					Log.Error($"Error removing piece {piece.PieceType}");
+				}
+
+			}
+        }
 	}
 }
