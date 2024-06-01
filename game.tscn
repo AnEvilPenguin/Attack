@@ -1,8 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://d34qmjavjqk5n"]
+[gd_scene load_steps=3 format=3 uid="uid://d34qmjavjqk5n"]
 
 [ext_resource type="PackedScene" uid="uid://crqa7iapulfxs" path="res://board.tscn" id="1_konm6"]
+[ext_resource type="PackedScene" uid="uid://lwuojubh0aus" path="res://piece_selector.tscn" id="2_i60g7"]
 
 [node name="Game" type="Node2D"]
 
 [node name="Board" parent="." instance=ExtResource("1_konm6")]
 position = Vector2(192, 48)
+
+[node name="PieceSelector" parent="." instance=ExtResource("2_i60g7")]
