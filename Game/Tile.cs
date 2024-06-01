@@ -39,7 +39,7 @@ namespace Attack.Game
 
         public void AddPiece(PieceNode piece)
         {
-            Log.Debug($"Adding {piece.PieceType} for {piece.Team} to {LocalPosition}");
+            Log.Debug($"Adding Piece {piece.PieceType} to {LocalPosition} for {piece.Team}");
 
             piece.Position = LocalPosition;
             Type = TileType.Piece;
@@ -53,7 +53,7 @@ namespace Attack.Game
             if (Piece == null)
                 return;
 
-            Log.Debug($"Removing {Piece.PieceType} for {Piece.Team} from {LocalPosition}");
+            Log.Debug($"Removing Piece {Piece.PieceType} for {Piece.Team} from {LocalPosition}");
 
             Piece = null;
             Type = TileType.Terrain;

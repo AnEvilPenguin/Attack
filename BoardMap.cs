@@ -108,7 +108,11 @@ public partial class BoardMap : TileMap
 			Log.Debug($"Clicked at {mapLocation}");
 
 			if (!lookup.TryGetValue(mapLocation, out Tile tile))
-				return;
+			{
+				Log.Debug("Click outside map");
+                return;
+            }
+				
 
 			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.StartingTile)
 			{
