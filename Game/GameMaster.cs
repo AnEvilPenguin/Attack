@@ -82,6 +82,7 @@ namespace Attack.Game
             GetTree().ChangeSceneToFile("res://game.tscn");
         }
 
+        // FIXME we should clean up games that aren't started on quit
         public void CreateGame(BoardMap board)
         {
             Log.Debug("Creating game from presets");
@@ -104,7 +105,9 @@ namespace Attack.Game
             GameStarted = true;
 
             _gameInstance.StartingPositions = _board.ListPieces();
-            //TODO savemanager save starting locations
+            _gameInstance.StartDate = DateTime.UtcNow;
+
+            _sqlSaveManager.SaveGame(_gameInstance);
         }
 
         public int GetPieceCount(PieceType pieceType) =>

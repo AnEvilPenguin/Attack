@@ -12,10 +12,11 @@ namespace Attack.Saves.SQLLite
 {
     internal class SaveGame : BaseSave
     {
-        private readonly string _connectionString;
+        private readonly SaveStartingLocations _startingLocations;
 
-        public SaveGame(string connectionString)
+        public SaveGame()
         {
+            _startingLocations = new SaveStartingLocations();
         }
 
         public GameInstance Create()
@@ -185,8 +186,13 @@ namespace Attack.Saves.SQLLite
                     Log.Error(ex, $"Failed to save game {game.Id}");
                     throw;
                 }
+
+                if (game.StartDate != null && !_startingLocations.HasStartLocations(game))
+                    _startingLocations.Save(game);
+
             }
         }
+
 
         public List<GameInstance> GetAll()
         {
