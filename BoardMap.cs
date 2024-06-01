@@ -3,6 +3,7 @@ using Godot;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class BoardMap : TileMap
 {
@@ -44,6 +45,12 @@ public partial class BoardMap : TileMap
 
 		Log.Debug("Completed creating piece");
     }
+
+	internal List<Tile> ListPieces() =>
+		tiles
+			.Where(t => !t.IsEmpty())
+			.ToList();
+		
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
