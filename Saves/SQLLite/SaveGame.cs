@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 
 namespace Attack.Saves.SQLLite
 {
-    internal class SaveGame
+    internal class SaveGame : BaseSave
     {
         private readonly string _connectionString;
 
         public SaveGame(string connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public GameInstance Create()
