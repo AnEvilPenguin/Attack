@@ -99,6 +99,11 @@ namespace Attack.Game
             Log.Debug("Completed creating game");
         }
 
+        public void StartGame()
+        {
+            GameStarted = true;
+        }
+
         public int GetPieceCount(PieceType pieceType) =>
             Constants.PieceLimits[pieceType] - _playerPieceCount[pieceType];
 

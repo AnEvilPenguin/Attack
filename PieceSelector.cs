@@ -92,7 +92,7 @@ public partial class PieceSelector : Control
     {
         Log.Debug("Game start pressed");
 
-        _gameMaster.GameStarted = true;
+        _gameMaster.StartGame();
 
         _startButton.Disabled = true;
 
