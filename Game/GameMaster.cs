@@ -47,6 +47,8 @@ namespace Attack.Game
 
         public void New()
         {
+            Log.Debug("Creating new game");
+
             try
             {
                 _gameInstance = _sqlSaveManager.NewGame();
@@ -57,8 +59,6 @@ namespace Attack.Game
             }
 
             _sqlSaveManager.SaveGame(_gameInstance);
-
-            GetTree().ChangeSceneToFile("res://game.tscn");
 
             _playerPieceCount = new Dictionary<PieceType, int>
             {
@@ -75,10 +75,17 @@ namespace Attack.Game
                 { PieceType.CommanderInChief, 0 },
                 { PieceType.Flag, 0 },
             };
+
+
+            Log.Debug("Loading game board");
+
+            GetTree().ChangeSceneToFile("res://game.tscn");
         }
 
         public void CreateGame(BoardMap board)
         {
+            Log.Debug("Creating game from presets");
+
             _board = board;
 
             foreach (var pieceConfig in Presets.StandardSetup.Locations)
@@ -88,6 +95,8 @@ namespace Attack.Game
 
                 _board.createPiece(location, pieceType, Team.Red);
             }
+
+            Log.Debug("Completed creating game");
         }
 
         public int GetPieceCount(PieceType pieceType) =>
