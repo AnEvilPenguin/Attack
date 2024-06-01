@@ -102,6 +102,9 @@ namespace Attack.Game
         public void StartGame()
         {
             GameStarted = true;
+
+            _gameInstance.StartingPositions = _board.ListPieces();
+            //TODO savemanager save starting locations
         }
 
         public int GetPieceCount(PieceType pieceType) =>
