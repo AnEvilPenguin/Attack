@@ -21,6 +21,8 @@ namespace Attack.Saves.SQLLite
 
         public GameInstance Create()
         {
+            Log.Information("Creating game instance");
+
             GameInstance instance = new GameInstance();
 
             using (var connection = new SqliteConnection(_connectionString))
@@ -44,6 +46,8 @@ namespace Attack.Saves.SQLLite
 
         public void Delete(GameInstance game)
         {
+            Log.Warning($"Deleting game instance {game.Id}");
+
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
@@ -74,6 +78,8 @@ namespace Attack.Saves.SQLLite
 
         public GameInstance Load(int id)
         {
+            Log.Information($"Loading game instance {id}");
+
             GameInstance instance = new GameInstance();
             SqliteDataReader reader;
 
@@ -128,6 +134,8 @@ namespace Attack.Saves.SQLLite
 
         public void Save(GameInstance game)
         {
+            Log.Information($"Saving game instance {game.Id}");
+
             using (var connection = new SqliteConnection( _connectionString))
             {
                 connection.Open();

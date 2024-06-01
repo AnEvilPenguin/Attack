@@ -50,6 +50,8 @@ namespace Attack.Options
 
         public List<Node> GetButtons()
         {
+            Log.Debug("Getting option buttons");
+
             var buttons = new List<Node>()
             {
                 new Label() { Text = "Fullscreen" },
@@ -65,6 +67,8 @@ namespace Attack.Options
             };
 
             buttons.Add(logButton);
+
+            Log.Debug("Completed getting option buttons");
 
             return buttons;
         }

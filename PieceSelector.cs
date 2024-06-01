@@ -1,5 +1,6 @@
 using Attack.Game;
 using Godot;
+using Serilog;
 using System;
 
 public partial class PieceSelector : Control
@@ -62,23 +63,35 @@ public partial class PieceSelector : Control
         _commanderInChiefButton.Text = $"Commander-in-chief ({_gameMaster.GetPieceCount(PieceType.CommanderInChief)})";
         _flagButton.Text = $"Flag ({_gameMaster.GetPieceCount(PieceType.Flag)})";
 
-        if (_gameMaster.IsPlacementComplete())
+        if (_startButton.Disabled && _gameMaster.IsPlacementComplete())
         {
+            Log.Debug("Placement complete");
             _startButton.Disabled = false;
+        }
+        else if (!_startButton.Disabled && !_gameMaster.IsPlacementComplete())
+        {
+            Log.Debug("Placement no longer complete");
+            _startButton.Disabled = true;
         }
 
     }
 
     public void OnButtonPressed(int id)
     {
-        if (_gameMaster != null)
+        Log.Debug($"Piece button {id} pressed");
+
+        if (_gameMaster == null )
         {
-            _gameMaster.SelectedPieceType = (PieceType)id;
+            Log.Error("Piece button pressed and gameMaster is null");
         }
+
+        _gameMaster.SelectedPieceType = (PieceType)id;
     }
 
     public void OnStartButtonPressed()
     {
+        Log.Debug("Game start pressed");
+
         _gameMaster.GameStarted = true;
 
         _startButton.Disabled = true;
