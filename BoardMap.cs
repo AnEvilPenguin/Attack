@@ -48,7 +48,7 @@ public partial class BoardMap : TileMap
 
 	internal List<Tile> ListPieces() =>
 		tiles
-			.Where(t => !t.IsEmpty())
+			.Where(t => t.Piece != null)
 			.ToList();
 		
 
