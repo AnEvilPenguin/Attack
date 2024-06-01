@@ -76,4 +76,13 @@ public partial class PieceSelector : Control
             _gameMaster.SelectedPieceType = (PieceType)id;
         }
     }
+
+    public void OnStartButtonPressed()
+    {
+        _gameMaster.GameStarted = true;
+
+        _startButton.Disabled = true;
+
+        this.Visible = false;
+    }
 }

@@ -82,3 +82,4 @@ text = "Start Game"
 [connection signal="pressed" from="VBoxContainer/BrigadierGeneral" to="." method="OnButtonPressed" binds= [9]]
 [connection signal="pressed" from="VBoxContainer/CommanderInChief" to="." method="OnButtonPressed" binds= [10]]
 [connection signal="pressed" from="VBoxContainer/Flag" to="." method="OnButtonPressed" binds= [11]]
+[connection signal="pressed" from="VBoxContainer/StartGame" to="." method="OnStartButtonPressed"]

@@ -57,11 +57,13 @@ public partial class BoardMap : TileMap
 				if (i == 0 || j == 0 || i == GridSize - 1 || j == GridSize - 1)
 					tileId = TileType.Border;
 
+				bool startingTile = tileId == TileType.Terrain && j > GridSize - 6;
+
 				var location = new Vector2I(i, j);
 
 				SetCell((int)MapLayer.Background, location, (int)tileId, new Vector2I(0,0), 0);
 
-				var tile = new Tile(location, MapToLocal(location));
+				var tile = new Tile(location, MapToLocal(location), startingTile);
 				tile.Type = tileId;
 
                 tiles.Add(tile);
@@ -90,12 +92,15 @@ public partial class BoardMap : TileMap
 				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
 		}
 
+		if (_gameMaster.GameStarted)
+			return;
+
 		if (Input.IsActionJustPressed("MouseClick"))
 		{
 			if (!lookup.TryGetValue(mapLocation, out Tile tile))
 				return;
 
-			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.Type == TileType.Terrain)
+			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.StartingTile)
 			{
                 PieceNode piece = PieceScene.Instantiate<PieceNode>();
                 AddChild(piece);
