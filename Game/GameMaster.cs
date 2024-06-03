@@ -153,5 +153,19 @@ namespace Attack.Game
         // database turns - id, startPosition, endPosition, capture, team
         // database - game with id
         // piece postions - gameid, pieceid, position
+
+        public override void _Notification(int what)
+        {
+            if (what == NotificationWMCloseRequest)
+            {
+                if(GameStarted)
+                    return;
+
+                Log.Debug("Cleaning up unstarted game");
+
+                _sqlSaveManager.DeleteGame(_gameInstance);
+                _gameInstance = null;
+            }
+        }
     }
 }
