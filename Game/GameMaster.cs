@@ -58,6 +58,10 @@ namespace Attack.Game
                 Log.Error(ex, "Failed to create new game");
             }
 
+            var random = new Random();
+            int flip = random.Next(0, 1);
+            _gameInstance.StartingTeam = (Team)flip;
+
             _sqlSaveManager.SaveGame(_gameInstance);
 
             _playerPieceCount = new Dictionary<PieceType, int>
@@ -108,10 +112,6 @@ namespace Attack.Game
             _gameInstance.StartDate = DateTime.UtcNow;
 
             _sqlSaveManager.SaveGame(_gameInstance);
-
-            var random = new Random();
-            int flip = random.Next(0, 1);
-            _gameInstance.StartingTeam = (Team)flip;
         }
 
         public int GetPieceCount(PieceType pieceType) =>
@@ -133,15 +133,6 @@ namespace Attack.Game
             !_playerPieceCount
                 .Keys
                 .Any(k => _playerPieceCount[k] != Constants.PieceLimits[k]);
-
-        // NewGame
-        // create new game
-        // create teams?
-        // add computer pieces to board
-        // add user pieces to list for processing
-        // force user to place all pieces?
-        // save game and peice locations
-        // flip coin for who goes first
 
         // LoadGame index
         // Place pieces

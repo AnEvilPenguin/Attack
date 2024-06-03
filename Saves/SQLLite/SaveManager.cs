@@ -19,14 +19,15 @@ namespace Attack.Saves.SQLLite
         private const string createGamesTableCommand =
             @"
                     CREATE TABLE 'Games' (
-	                    'Id'	        INTEGER,
-	                    'SaveName'	    TEXT,
-	                    'Player1Name'	TEXT,
-	                    'Player2Name'	TEXT,
-	                    'StartDate'	    TEXT,
-	                    'UpdateDate'	TEXT,
-	                    'CompletedDate'	TEXT,
-	                    'Version'	    INTEGER NOT NULL DEFAULT 1,
+	                    'Id'	            INTEGER,
+	                    'SaveName'	        TEXT,
+	                    'Player1Name'	    TEXT,
+	                    'Player2Name'	    TEXT,
+	                    'StartDate'	        TEXT,
+	                    'UpdateDate'	    TEXT,
+	                    'CompletedDate'	    TEXT,
+                        'StartingPlayer'    INTEGER,
+	                    'Version'	        INTEGER NOT NULL DEFAULT 1,
 	                    PRIMARY KEY('Id' AUTOINCREMENT)
                     );
             ";

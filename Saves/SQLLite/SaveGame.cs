@@ -150,7 +150,8 @@ namespace Attack.Saves.SQLLite
                             Player2Name = $player2Name,
                             StartDate = $startDate,
                             UpdateDate = $updateDate,
-                            CompletedDate = $completedDate
+                            CompletedDate = $completedDate,
+                            StartingPlayer = $startingPlayer
                         WHERE Id = $Id
                     ";
 
@@ -160,6 +161,8 @@ namespace Attack.Saves.SQLLite
 
                 command.Parameters.AddWithValue("$player1Name", game.Player1);
                 command.Parameters.AddWithValue("$player2Name", game.Player2);
+
+                command.Parameters.AddWithValue("$startingPlayer", (int)game.StartingTeam);
 
                 if (game.StartDate == null)
                     command.Parameters.AddWithValue("$startDate", DBNull.Value);
