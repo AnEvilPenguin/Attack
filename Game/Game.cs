@@ -21,5 +21,7 @@ namespace Attack.Game
         public string SaveName = $"Auto {DateTime.Now:f}";
 
         public List<Tile> StartingPositions;
+
+        public Team StartingTeam;
     }
 }

@@ -108,6 +108,10 @@ namespace Attack.Game
             _gameInstance.StartDate = DateTime.UtcNow;
 
             _sqlSaveManager.SaveGame(_gameInstance);
+
+            var random = new Random();
+            int flip = random.Next(0, 1);
+            _gameInstance.StartingTeam = (Team)flip;
         }
 
         public int GetPieceCount(PieceType pieceType) =>
