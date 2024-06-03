@@ -82,6 +82,22 @@ public partial class PieceNode : Node2D
         { 
             _pieceType = value; 
             _control.TooltipText = $"{value} ({(int)value})"; // TODO only show tooltip if piece is 'exposed'
+
+            switch (_pieceType) 
+            {
+                case PieceType.Flag:
+                case PieceType.Landmine:
+                    Range = 0;
+                    break;
+
+                case PieceType.Scout: 
+                    Range = 10;
+                    break;
+
+                default: 
+                    Range = 1;
+                    break;
+            }
         }
     }
 

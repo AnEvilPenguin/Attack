@@ -124,11 +124,11 @@ public partial class BoardMap : TileMap
 
             if (_gameMaster.GameStarted)
 			{
-				processGameLeftClick(tile);
+				ProcessGameLeftClick(tile);
 				return;
 			}
 
-			processSetupLeftClick(tile);
+			ProcessSetupLeftClick(tile);
 			return;
 		}
 
@@ -138,16 +138,16 @@ public partial class BoardMap : TileMap
 
 			if (_gameMaster.GameStarted)
             {
-                processGameRightClick(tile);
+                ProcessGameRightClick(tile);
                 return;
             }
 
-			processSetupRightClick(tile);
+			ProcessSetupRightClick(tile);
 			return;
         }
 	}
 
-	void processSetupLeftClick(Tile tile)
+	private void ProcessSetupLeftClick(Tile tile)
 	{
 		if (!tile.IsEmpty() || !_gameMaster.IsPiecePlaceable() || !tile.StartingTile)
 			return;
@@ -166,7 +166,79 @@ public partial class BoardMap : TileMap
         Log.Debug("Completed placement of tile");
     }
 
-    void processGameLeftClick(Tile tile)
+	private void SelectNormalPiece(Tile tile)
+	{
+        var location = tile.Position;
+
+        var neighbours = GetSurroundingCells(location);
+
+        foreach (var neighbor in neighbours)
+        {
+            if (!lookup.TryGetValue(neighbor, out Tile neighbourTile))
+                continue;
+
+            if (neighbourTile.IsEmpty())
+            {
+                SetCell((int)MapLayer.Highlight, neighbor, 3, new Vector2I(0, 0), 0);
+                _selectedTile = tile;
+            }
+        }
+    }
+
+	private void SelectRangedPiece(Tile tile)
+	{
+        var tiles = new List<Tile>();
+        var piece = tile.Piece;
+
+		tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.RightSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.LeftSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.TopSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.BottomSide, tiles);
+
+		foreach (var neighbor in tiles)
+		{
+            SetCell((int)MapLayer.Highlight, neighbor.Position, 3, new Vector2I(0, 0), 0);
+
+			if (_selectedTile == null)
+				_selectedTile = tile;
+        }
+
+    }
+
+	private List<Tile> GetTileRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles)
+	{
+		bool canContinue = true;
+
+		do
+		{
+			if (--range == 0)
+				canContinue = false;
+
+			var neighbor = GetNeighborCell(tile.Position, direction);
+
+            if (lookup.TryGetValue(neighbor, out Tile neighbourTile))
+			{
+				if (neighbourTile.IsEmpty())
+				{
+					tiles.Add(neighbourTile);
+					tile = neighbourTile;
+                }
+				else
+				{
+					canContinue = false;
+				}
+			}
+			else
+			{
+				canContinue = false;
+			}
+
+		} while (canContinue);
+
+		return tiles;
+	}
+
+    private void ProcessGameLeftClick(Tile tile)
     {
 		Log.Debug("Left click in game");
 
@@ -178,22 +250,20 @@ public partial class BoardMap : TileMap
 		if (tile.Piece.Team != Team.Blue)
 			return;
 
-		var location = tile.Position;
+		var piece = tile.Piece;
 
-		var neighbours = GetSurroundingCells(location);
+		if (piece.Range < 1)
+			return;
 
-		foreach (var neighbor in neighbours)
+		if (piece.Range == 1)
 		{
-			if (!lookup.TryGetValue(neighbor, out Tile neighbourTile))
-				continue;
+			SelectNormalPiece(tile);
+			return;
+		}
 
-			if (neighbourTile.IsEmpty())
-			{
-                SetCell((int)MapLayer.Highlight, neighbor, 3, new Vector2I(0, 0), 0);
-				_selectedTile = tile;
-            }	
-        }
+        SelectRangedPiece(tile);
 
+			
 		// TODO check if there is piece selected.
 			// if not check if piece can move
 				// select piece
@@ -207,7 +277,7 @@ public partial class BoardMap : TileMap
 			// profit?
     }
 
-	void processSetupRightClick(Tile tile)
+	private void ProcessSetupRightClick(Tile tile)
 	{
 		if (tile.IsEmpty() && tile.Piece.Team != Team.Blue)
 			return;
@@ -231,7 +301,7 @@ public partial class BoardMap : TileMap
         }
     }
 
-	void processGameRightClick(Tile tile)
+	private void ProcessGameRightClick(Tile tile)
 	{
 		Log.Debug("Right click in game");
 		_selectedTile = null;
