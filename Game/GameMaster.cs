@@ -24,6 +24,7 @@ namespace Attack.Game
         public bool GameStarted = false;
 
         private BoardMap _board;
+        private Notification _notification;
 
         private Dictionary<PieceType, int> _playerPieceCount;
 
@@ -59,7 +60,7 @@ namespace Attack.Game
             }
 
             var random = new Random();
-            int flip = random.Next(0, 1);
+            int flip = random.Next(0, 2);
             _gameInstance.StartingTeam = (Team)flip;
 
             _sqlSaveManager.SaveGame(_gameInstance);
@@ -86,7 +87,6 @@ namespace Attack.Game
             GetTree().ChangeSceneToFile("res://game.tscn");
         }
 
-        // FIXME we should clean up games that aren't started on quit
         public void CreateGame(BoardMap board)
         {
             Log.Debug("Creating game from presets");
@@ -112,6 +112,8 @@ namespace Attack.Game
             _gameInstance.StartDate = DateTime.UtcNow;
 
             _sqlSaveManager.SaveGame(_gameInstance);
+
+            _notification.SendNotification($"{_gameInstance.StartingTeam} to start!");
         }
 
         public int GetPieceCount(PieceType pieceType) =>
@@ -162,5 +164,8 @@ namespace Attack.Game
                 _gameInstance = null;
             }
         }
+
+        public void RegisterNotification(Notification notification) =>
+            _notification = notification;
     }
 }
