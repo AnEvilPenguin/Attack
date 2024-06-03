@@ -22,8 +22,10 @@ namespace Attack.Game
         private GameInstance _gameInstance;
 
         public bool GameStarted = false;
+        public bool NotificationShowing = false;
 
         private BoardMap _board;
+        private Notification _notification;
 
         private Dictionary<PieceType, int> _playerPieceCount;
 
@@ -57,6 +59,10 @@ namespace Attack.Game
             {
                 Log.Error(ex, "Failed to create new game");
             }
+
+            var random = new Random();
+            int flip = random.Next(0, 2);
+            _gameInstance.StartingTeam = (Team)flip;
 
             _sqlSaveManager.SaveGame(_gameInstance);
 
@@ -99,6 +105,19 @@ namespace Attack.Game
             Log.Debug("Completed creating game");
         }
 
+        public void StartGame()
+        {
+            GameStarted = true;
+
+            _gameInstance.StartingPositions = _board.ListPieces();
+            _gameInstance.StartDate = DateTime.UtcNow;
+
+            _sqlSaveManager.SaveGame(_gameInstance);
+
+            _notification.SendNotification($"{_gameInstance.StartingTeam} to start!");
+            NotificationShowing = true;
+        }
+
         public int GetPieceCount(PieceType pieceType) =>
             Constants.PieceLimits[pieceType] - _playerPieceCount[pieceType];
 
@@ -119,15 +138,6 @@ namespace Attack.Game
                 .Keys
                 .Any(k => _playerPieceCount[k] != Constants.PieceLimits[k]);
 
-        // NewGame
-        // create new game
-        // create teams?
-        // add computer pieces to board
-        // add user pieces to list for processing
-        // force user to place all pieces?
-        // save game and peice locations
-        // flip coin for who goes first
-
         // LoadGame index
         // Place pieces
         // Load history to replayed stack in order
@@ -142,5 +152,22 @@ namespace Attack.Game
         // database turns - id, startPosition, endPosition, capture, team
         // database - game with id
         // piece postions - gameid, pieceid, position
+
+        public override void _Notification(int what)
+        {
+            if (what == NotificationWMCloseRequest)
+            {
+                if(GameStarted)
+                    return;
+
+                Log.Debug("Cleaning up unstarted game");
+
+                _sqlSaveManager.DeleteGame(_gameInstance);
+                _gameInstance = null;
+            }
+        }
+
+        public void RegisterNotification(Notification notification) =>
+            _notification = notification;
     }
 }

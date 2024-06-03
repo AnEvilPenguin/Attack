@@ -3,6 +3,8 @@ using Godot;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 public partial class BoardMap : TileMap
 {
@@ -10,7 +12,8 @@ public partial class BoardMap : TileMap
 	{
 		Background,
 		Pieces,
-		Overlay
+		Overlay,
+		Highlight
 	}
 
 	[Export]
@@ -24,6 +27,8 @@ public partial class BoardMap : TileMap
 	private Vector2 _offset;
 
 	private GameMaster _gameMaster;
+
+	private Tile _selectedTile;
 
 	internal void createPiece(Vector2I location, PieceType type, Team team)
 	{
@@ -44,6 +49,12 @@ public partial class BoardMap : TileMap
 
 		Log.Debug("Completed creating piece");
     }
+
+	internal List<Tile> ListPieces() =>
+		tiles
+			.Where(t => t.Piece != null)
+			.ToList();
+		
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -89,76 +100,210 @@ public partial class BoardMap : TileMap
 	{
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
+		if (_selectedTile == null)
+            tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
+
+        if (_gameMaster.NotificationShowing)
+			return;
+
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
 
-		if (lookup.ContainsKey(mapLocation))
-		{
-			var tile = lookup[mapLocation];
+        if (!lookup.TryGetValue(mapLocation, out Tile tile))
+        {
+            Log.Debug("Click outside map");
+            return;
+        }
 
-			if (tile.Type != TileType.Border)
-				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
-		}
-
-		if (_gameMaster.GameStarted)
-			return;
+		if (tile.Type != TileType.Border)
+			SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
 
 		if (Input.IsActionJustPressed("MouseClick"))
 		{
-			Log.Debug($"Clicked at {mapLocation}");
+            Log.Debug($"Clicked at {mapLocation}");
 
-			if (!lookup.TryGetValue(mapLocation, out Tile tile))
+            if (_gameMaster.GameStarted)
 			{
-				Log.Debug("Click outside map");
-                return;
-            }
-				
+				ProcessGameLeftClick(tile);
+				return;
+			}
 
-			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.StartingTile)
-			{
-				Log.Debug("Placeable tile");
-
-                PieceNode piece = PieceScene.Instantiate<PieceNode>();
-                AddChild(piece);
-
-                piece.PieceType = _gameMaster.SelectedPieceType;
-				piece.Team = Team.Blue;
-
-                tile.AddPiece(piece);
-				_gameMaster.AssignPiece();
-
-                Log.Debug("Completed placement of tile");
-            }
+			ProcessSetupLeftClick(tile);
+			return;
 		}
 
 		if (Input.IsActionJustPressed("RightClick"))
 		{
             Log.Debug($"Right Clicked at {mapLocation}");
 
-            if (!lookup.TryGetValue(mapLocation, out Tile tile))
+			if (_gameMaster.GameStarted)
+            {
+                ProcessGameRightClick(tile);
                 return;
+            }
 
-            if (!tile.IsEmpty() && tile.Piece.Team == Team.Blue)
+			ProcessSetupRightClick(tile);
+			return;
+        }
+	}
+
+	private void ProcessSetupLeftClick(Tile tile)
+	{
+		if (!tile.IsEmpty() || !_gameMaster.IsPiecePlaceable() || !tile.StartingTile)
+			return;
+
+        Log.Debug("Placeable tile");
+
+        PieceNode piece = PieceScene.Instantiate<PieceNode>();
+        AddChild(piece);
+
+        piece.PieceType = _gameMaster.SelectedPieceType;
+        piece.Team = Team.Blue;
+
+        tile.AddPiece(piece);
+        _gameMaster.AssignPiece();
+
+        Log.Debug("Completed placement of tile");
+    }
+
+	private void SelectNormalPiece(Tile tile)
+	{
+        var location = tile.Position;
+
+        var neighbours = GetSurroundingCells(location);
+
+        foreach (var neighbor in neighbours)
+        {
+            if (!lookup.TryGetValue(neighbor, out Tile neighbourTile))
+                continue;
+
+            if (neighbourTile.IsEmpty())
+            {
+                SetCell((int)MapLayer.Highlight, neighbor, 3, new Vector2I(0, 0), 0);
+                _selectedTile = tile;
+            }
+        }
+    }
+
+	private void SelectRangedPiece(Tile tile)
+	{
+        var tiles = new List<Tile>();
+        var piece = tile.Piece;
+
+		tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.RightSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.LeftSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.TopSide, tiles);
+        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.BottomSide, tiles);
+
+		foreach (var neighbor in tiles)
+		{
+            SetCell((int)MapLayer.Highlight, neighbor.Position, 3, new Vector2I(0, 0), 0);
+
+			if (_selectedTile == null)
+				_selectedTile = tile;
+        }
+
+    }
+
+	private List<Tile> GetTileRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles)
+	{
+		bool canContinue = true;
+
+		do
+		{
+			if (--range == 0)
+				canContinue = false;
+
+			var neighbor = GetNeighborCell(tile.Position, direction);
+
+            if (lookup.TryGetValue(neighbor, out Tile neighbourTile))
 			{
-				var piece = tile.Piece;
-
-                if (_gameMaster.IsPieceRemovable(piece.PieceType))
+				if (neighbourTile.IsEmpty())
 				{
-                    Log.Debug("Removable piece");
-
-                    tile.RemovePiece();
-                    _gameMaster.RemovePiece(piece.PieceType);
-
-                    piece.QueueFree();
-
-                    Log.Debug("Completed removal of tile");
+					tiles.Add(neighbourTile);
+					tile = neighbourTile;
                 }
 				else
 				{
-					Log.Error($"Error removing piece {piece.PieceType}");
+					canContinue = false;
 				}
-
 			}
+			else
+			{
+				canContinue = false;
+			}
+
+		} while (canContinue);
+
+		return tiles;
+	}
+
+    private void ProcessGameLeftClick(Tile tile)
+    {
+		Log.Debug("Left click in game");
+
+        tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
+
+        if (tile.IsEmpty())
+			return;
+
+		if (tile.Piece.Team != Team.Blue)
+			return;
+
+		var piece = tile.Piece;
+
+		if (piece.Range < 1)
+			return;
+
+		if (piece.Range == 1)
+		{
+			SelectNormalPiece(tile);
+			return;
+		}
+
+        SelectRangedPiece(tile);
+
+			
+		// TODO check if there is piece selected.
+			// if not check if piece can move
+				// select piece
+				// mark valid moves
+				// mark valid attack choices
+		// check if destination tile empty
+			// check if valid move
+				// move piece
+				// mark valid attack choices
+			// check if valid attack destination
+			// profit?
+    }
+
+	private void ProcessSetupRightClick(Tile tile)
+	{
+		if (tile.IsEmpty() && tile.Piece.Team != Team.Blue)
+			return;
+
+        var piece = tile.Piece;
+
+        if (_gameMaster.IsPieceRemovable(piece.PieceType))
+        {
+            Log.Debug("Removable piece");
+
+            tile.RemovePiece();
+            _gameMaster.RemovePiece(piece.PieceType);
+
+            piece.QueueFree();
+
+            Log.Debug("Completed removal of tile");
         }
+        else
+        {
+            Log.Error($"Error removing piece {piece.PieceType}");
+        }
+    }
+
+	private void ProcessGameRightClick(Tile tile)
+	{
+		Log.Debug("Right click in game");
+		_selectedTile = null;
 	}
 }

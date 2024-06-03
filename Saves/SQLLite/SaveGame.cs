@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Attack.Saves.SQLLite
 {
-    internal class SaveGame
+    internal class SaveGame : BaseSave
     {
-        private readonly string _connectionString;
+        private readonly SaveStartingLocations _startingLocations;
 
-        public SaveGame(string connectionString)
+        public SaveGame()
         {
-            _connectionString = connectionString;
+            _startingLocations = new SaveStartingLocations();
         }
 
         public GameInstance Create()
@@ -150,7 +150,8 @@ namespace Attack.Saves.SQLLite
                             Player2Name = $player2Name,
                             StartDate = $startDate,
                             UpdateDate = $updateDate,
-                            CompletedDate = $completedDate
+                            CompletedDate = $completedDate,
+                            StartingPlayer = $startingPlayer
                         WHERE Id = $Id
                     ";
 
@@ -160,6 +161,8 @@ namespace Attack.Saves.SQLLite
 
                 command.Parameters.AddWithValue("$player1Name", game.Player1);
                 command.Parameters.AddWithValue("$player2Name", game.Player2);
+
+                command.Parameters.AddWithValue("$startingPlayer", (int)game.StartingTeam);
 
                 if (game.StartDate == null)
                     command.Parameters.AddWithValue("$startDate", DBNull.Value);
@@ -186,8 +189,13 @@ namespace Attack.Saves.SQLLite
                     Log.Error(ex, $"Failed to save game {game.Id}");
                     throw;
                 }
+
+                if (game.StartDate != null && !_startingLocations.HasStartLocations(game))
+                    _startingLocations.Save(game);
+
             }
         }
+
 
         public List<GameInstance> GetAll()
         {

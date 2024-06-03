@@ -59,6 +59,7 @@ namespace Attack.Game
             Type = TileType.Terrain;
         }
 
+        // FIXME this doesn't seem to work in some cases?
         public bool IsEmpty() => Piece == null && Type == TileType.Terrain;
     }
 }

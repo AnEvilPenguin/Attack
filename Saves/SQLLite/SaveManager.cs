@@ -12,33 +12,24 @@ using Attack.Game;
 
 namespace Attack.Saves.SQLLite
 {
-    internal class SaveManager
+    internal class SaveManager : BaseSave
     {
         private readonly string _databasePath = $"{Constants.FolderPath}\\saves.db";
-        private readonly string _connectionString;
 
         private const string createGamesTableCommand =
             @"
                     CREATE TABLE 'Games' (
-	                    'Id'	        INTEGER,
-	                    'SaveName'	    TEXT,
-	                    'Player1Name'	TEXT,
-	                    'Player2Name'	TEXT,
-	                    'StartDate'	    TEXT,
-	                    'UpdateDate'	TEXT,
-	                    'CompletedDate'	TEXT,
-	                    'Version'	    INTEGER NOT NULL DEFAULT 1,
+	                    'Id'	            INTEGER,
+	                    'SaveName'	        TEXT,
+	                    'Player1Name'	    TEXT,
+	                    'Player2Name'	    TEXT,
+	                    'StartDate'	        TEXT,
+	                    'UpdateDate'	    TEXT,
+	                    'CompletedDate'	    TEXT,
+                        'StartingPlayer'    INTEGER,
+	                    'Version'	        INTEGER NOT NULL DEFAULT 1,
 	                    PRIMARY KEY('Id' AUTOINCREMENT)
                     );
-            ";
-
-        private const string createPiecesTableCommand =
-            @"
-                CREATE TABLE 'Pieces' (
-	                'Id'	INTEGER NOT NULL,
-	                'Type'	INTEGER NOT NULL,
-	                PRIMARY KEY('Id' AUTOINCREMENT)
-                );
             ";
 
         private const string createPositionsTableCommand =
@@ -50,7 +41,6 @@ namespace Attack.Saves.SQLLite
 	                'StartX'	INTEGER NOT NULL,
 	                'StartY'	INTEGER NOT NULL,
 	                'Player'	INTEGER NOT NULL,
-	                FOREIGN KEY('PieceId') REFERENCES 'Pieces'('Id'),
 	                FOREIGN KEY('GameId') REFERENCES 'Games'('Id'),
 	                PRIMARY KEY('Id' AUTOINCREMENT)
                 );
@@ -69,7 +59,6 @@ namespace Attack.Saves.SQLLite
 	                'Capture'	INTEGER,
 	                'TurnNumber'	INTEGER,
 	                'DateTime'	TEXT,
-	                FOREIGN KEY('Piece') REFERENCES 'Pieces'('Id'),
 	                FOREIGN KEY('Capture') REFERENCES 'Pieces'('Id'),
 	                FOREIGN KEY('Game') REFERENCES 'Games'('Id'),
 	                PRIMARY KEY('Id' AUTOINCREMENT)
@@ -83,7 +72,7 @@ namespace Attack.Saves.SQLLite
             Log.Debug("SqlLiteSaveManager Constructed");
             _connectionString = $"Data Source={_databasePath}";
 
-            _saveGame = new SaveGame(_connectionString);
+            _saveGame = new SaveGame();
         }
 
         public GameInstance NewGame() =>
@@ -116,7 +105,6 @@ namespace Attack.Saves.SQLLite
                 connection.Open();
 
                 createTable(connection, "Games", createGamesTableCommand);
-                createTable(connection, "Pieces", createPiecesTableCommand);
                 createTable(connection, "Positions", createPositionsTableCommand);
                 createTable(connection, "Turns", createTurnsTableCommand);
 

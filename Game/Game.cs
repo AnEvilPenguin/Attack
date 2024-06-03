@@ -19,5 +19,9 @@ namespace Attack.Game
         public string Player2 = "Robot Louis Stevenson";
 
         public string SaveName = $"Auto {DateTime.Now:f}";
+
+        public List<Tile> StartingPositions;
+
+        public Team StartingTeam;
     }
 }
