@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public partial class BoardMap : TileMap
 {
@@ -99,73 +100,105 @@ public partial class BoardMap : TileMap
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
 
-		if (lookup.ContainsKey(mapLocation))
-		{
-			var tile = lookup[mapLocation];
+        if (!lookup.TryGetValue(mapLocation, out Tile tile))
+        {
+            Log.Debug("Click outside map");
+            return;
+        }
 
-			if (tile.Type != TileType.Border)
-				SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
-		}
-
-		if (_gameMaster.GameStarted)
-			return;
+		if (tile.Type != TileType.Border)
+			SetCell((int)MapLayer.Overlay, mapLocation, 0, new Vector2I(0,0), 0);
 
 		if (Input.IsActionJustPressed("MouseClick"))
 		{
-			Log.Debug($"Clicked at {mapLocation}");
+            Log.Debug($"Clicked at {mapLocation}");
 
-			if (!lookup.TryGetValue(mapLocation, out Tile tile))
+            if (_gameMaster.GameStarted)
 			{
-				Log.Debug("Click outside map");
-                return;
-            }
-				
+				processGameLeftClick(tile);
+				return;
+			}
 
-			if (tile.IsEmpty() && _gameMaster.IsPiecePlaceable() && tile.StartingTile)
-			{
-				Log.Debug("Placeable tile");
-
-                PieceNode piece = PieceScene.Instantiate<PieceNode>();
-                AddChild(piece);
-
-                piece.PieceType = _gameMaster.SelectedPieceType;
-				piece.Team = Team.Blue;
-
-                tile.AddPiece(piece);
-				_gameMaster.AssignPiece();
-
-                Log.Debug("Completed placement of tile");
-            }
+			processSetupLeftClick(tile);
+			return;
 		}
 
 		if (Input.IsActionJustPressed("RightClick"))
 		{
             Log.Debug($"Right Clicked at {mapLocation}");
 
-            if (!lookup.TryGetValue(mapLocation, out Tile tile))
+			if (_gameMaster.GameStarted)
+            {
+                processGameRightClick(tile);
                 return;
+            }
 
-            if (!tile.IsEmpty() && tile.Piece.Team == Team.Blue)
-			{
-				var piece = tile.Piece;
-
-                if (_gameMaster.IsPieceRemovable(piece.PieceType))
-				{
-                    Log.Debug("Removable piece");
-
-                    tile.RemovePiece();
-                    _gameMaster.RemovePiece(piece.PieceType);
-
-                    piece.QueueFree();
-
-                    Log.Debug("Completed removal of tile");
-                }
-				else
-				{
-					Log.Error($"Error removing piece {piece.PieceType}");
-				}
-
-			}
+			processSetupRightClick(tile);
+			return;
         }
+	}
+
+	void processSetupLeftClick(Tile tile)
+	{
+		if (!tile.IsEmpty() || !_gameMaster.IsPiecePlaceable() || !tile.StartingTile)
+			return;
+
+        Log.Debug("Placeable tile");
+
+        PieceNode piece = PieceScene.Instantiate<PieceNode>();
+        AddChild(piece);
+
+        piece.PieceType = _gameMaster.SelectedPieceType;
+        piece.Team = Team.Blue;
+
+        tile.AddPiece(piece);
+        _gameMaster.AssignPiece();
+
+        Log.Debug("Completed placement of tile");
+    }
+
+    void processGameLeftClick(Tile tile)
+    {
+		Log.Debug("Left click in game");
+		// TODO check if there is piece selected.
+			// if not check if piece can move
+				// select piece
+				// mark valid moves
+				// mark valid attack choices
+		// check if destination tile empty
+			// check if valid move
+				// move piece
+				// mark valid attack choices
+			// check if valid attack destination
+			// profit?
+    }
+
+	void processSetupRightClick(Tile tile)
+	{
+		if (tile.IsEmpty() && tile.Piece.Team != Team.Blue)
+			return;
+
+        var piece = tile.Piece;
+
+        if (_gameMaster.IsPieceRemovable(piece.PieceType))
+        {
+            Log.Debug("Removable piece");
+
+            tile.RemovePiece();
+            _gameMaster.RemovePiece(piece.PieceType);
+
+            piece.QueueFree();
+
+            Log.Debug("Completed removal of tile");
+        }
+        else
+        {
+            Log.Error($"Error removing piece {piece.PieceType}");
+        }
+    }
+
+	void processGameRightClick(Tile tile)
+	{
+		Log.Debug("Right click in game");
 	}
 }
