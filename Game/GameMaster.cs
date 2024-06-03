@@ -22,6 +22,7 @@ namespace Attack.Game
         private GameInstance _gameInstance;
 
         public bool GameStarted = false;
+        public bool NotificationShowing = false;
 
         private BoardMap _board;
         private Notification _notification;
@@ -114,6 +115,7 @@ namespace Attack.Game
             _sqlSaveManager.SaveGame(_gameInstance);
 
             _notification.SendNotification($"{_gameInstance.StartingTeam} to start!");
+            NotificationShowing = true;
         }
 
         public int GetPieceCount(PieceType pieceType) =>

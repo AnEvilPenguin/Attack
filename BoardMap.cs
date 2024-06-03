@@ -12,7 +12,8 @@ public partial class BoardMap : TileMap
 	{
 		Background,
 		Pieces,
-		Overlay
+		Overlay,
+		Highlight
 	}
 
 	[Export]
@@ -26,6 +27,8 @@ public partial class BoardMap : TileMap
 	private Vector2 _offset;
 
 	private GameMaster _gameMaster;
+
+	private Tile _selectedTile;
 
 	internal void createPiece(Vector2I location, PieceType type, Team team)
 	{
@@ -97,6 +100,12 @@ public partial class BoardMap : TileMap
 	{
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
+		if (_selectedTile == null)
+            tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
+
+        if (_gameMaster.NotificationShowing)
+			return;
+
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
 
@@ -160,6 +169,31 @@ public partial class BoardMap : TileMap
     void processGameLeftClick(Tile tile)
     {
 		Log.Debug("Left click in game");
+
+        tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
+
+        if (tile.IsEmpty())
+			return;
+
+		if (tile.Piece.Team != Team.Blue)
+			return;
+
+		var location = tile.Position;
+
+		var neighbours = GetSurroundingCells(location);
+
+		foreach (var neighbor in neighbours)
+		{
+			if (!lookup.TryGetValue(neighbor, out Tile neighbourTile))
+				continue;
+
+			if (neighbourTile.IsEmpty())
+			{
+                SetCell((int)MapLayer.Highlight, neighbor, 3, new Vector2I(0, 0), 0);
+				_selectedTile = tile;
+            }	
+        }
+
 		// TODO check if there is piece selected.
 			// if not check if piece can move
 				// select piece
@@ -200,5 +234,6 @@ public partial class BoardMap : TileMap
 	void processGameRightClick(Tile tile)
 	{
 		Log.Debug("Right click in game");
+		_selectedTile = null;
 	}
 }

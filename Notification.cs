@@ -44,6 +44,7 @@ public partial class Notification : Control
 	public void AcceptButtonPressed()
 	{
         Visible = false;
-		// TODO call back to master
+		_gameMaster.NotificationShowing = false;
+		// TODO call back to master?
 	}
 }
