@@ -328,6 +328,26 @@ public partial class BoardMap : TileMap
 	private void ProcessGameRightClick(Tile tile)
 	{
 		Log.Debug("Right click in game");
+
+		if (_selectedTile == null)
+			return;
+
+		if (_destinationTile == null)
+		{
+			Log.Debug("Clearing selected tile");
+
+            _selectedTile = null;
+			return;
+        }
+
+		Log.Debug("Reverting move");
+
+		var piece = _destinationTile.Piece;
+
+		_destinationTile.RemovePiece();
+		_selectedTile.AddPiece(piece);
+
 		_selectedTile = null;
+		_destinationTile = null;
 	}
 }
