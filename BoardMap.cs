@@ -28,6 +28,7 @@ public partial class BoardMap : TileMap
 
 	private GameMaster _gameMaster;
 
+	// TODO refactor this into a 'Turn' / 'PlayerTurn' / 'AITurn'
 	private Tile _selectedTile;
 	private Tile _destinationTile;
 
@@ -272,6 +273,7 @@ public partial class BoardMap : TileMap
             _destinationTile.AddPiece(piece);
 
             // Notify end of turn available?
+			_gameMaster.CanCompleteTurn = true;
 
             processAttackMarkers(tile);
 

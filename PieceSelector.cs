@@ -22,6 +22,8 @@ public partial class PieceSelector : Control
 
     private Button _startButton;
 
+    private Button _finishTurn;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -41,6 +43,8 @@ public partial class PieceSelector : Control
         _flagButton = GetNode<Button>("VBoxContainer/Flag");
 
         _startButton = GetNode<Button>("VBoxContainer/StartGame");
+
+        _finishTurn = GetNode<Button>("VBoxContainer/FinishTurn");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -48,7 +52,23 @@ public partial class PieceSelector : Control
     {
 
         if (_gameMaster.GameStarted)
+        {
+            if (_finishTurn.Disabled && _gameMaster.CanCompleteTurn)
+            {
+                Log.Debug("Finish turn available");
+                _finishTurn.Disabled = false;
+                _finishTurn.Visible = true;
+            }
+            else if (!_finishTurn.Disabled && !_gameMaster.CanCompleteTurn)
+            {
+                Log.Debug("Finish turn not available");
+                _finishTurn.Disabled = true;
+                _finishTurn.Visible = false;
+            }
+
             return;
+        }
+
 
         _landmineButton.Text = $"Landmine ({_gameMaster.GetPieceCount(PieceType.Landmine)})";
         _spyButton.Text = $"Spy ({_gameMaster.GetPieceCount(PieceType.Spy)})";
@@ -80,7 +100,7 @@ public partial class PieceSelector : Control
     {
         Log.Debug($"Piece button {id} pressed");
 
-        if (_gameMaster == null )
+        if (_gameMaster == null)
         {
             Log.Error("Piece button pressed and gameMaster is null");
         }
@@ -96,6 +116,24 @@ public partial class PieceSelector : Control
 
         _startButton.Disabled = true;
 
-        this.Visible = false;
+        _landmineButton.Visible = false;
+        _spyButton.Visible = false;
+        _scoutButton.Visible = false;
+        _engineerButton.Visible = false;
+        _sergeantButton.Visible = false;
+        _lieutenantButton.Visible = false;
+        _captainButton.Visible = false;
+        _commandantButton.Visible = false;
+        _colonelButton.Visible = false;
+        _brigadierGeneralButton.Visible = false;
+        _commanderInChiefButton.Visible = false;
+        _flagButton.Visible = false;
+
+        _startButton.Visible = false;
+    }
+
+    public void OnFinishTurnPressed()
+    {
+        Log.Debug("Finish Turn pressed");
     }
 }

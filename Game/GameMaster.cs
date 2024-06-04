@@ -22,6 +22,7 @@ namespace Attack.Game
         private GameInstance _gameInstance;
 
         public bool GameStarted = false;
+        public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
 
         private BoardMap _board;
