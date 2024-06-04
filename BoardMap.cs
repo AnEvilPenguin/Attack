@@ -245,9 +245,16 @@ public partial class BoardMap : TileMap
 
         tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
 
-		if (_selectedTile == null)
+        if (_destinationTile != null)
+		{
+            processAttackMarkers(_destinationTile);
+			return;
+        }     
+
+        if (_selectedTile == null)
 		{
             processTileSelection(tile);
+			processAttackMarkers(tile);
 			return;
         }
 
@@ -264,14 +271,20 @@ public partial class BoardMap : TileMap
 			_selectedTile.RemovePiece();
             _destinationTile.AddPiece(piece);
 
-			// Notify end of turn available?
-			return;
+            // Notify end of turn available?
+
+            processAttackMarkers(tile);
+
+            // Mark valid attacks if relevant.
+            return;
 		}
 
 		if(!tile.IsEmpty())
 		{
 			_selectedTile = null;
 			processTileSelection(tile);
+            processAttackMarkers(tile);
+			return;
         }
 
         // TODO check if there is piece selected.
@@ -286,6 +299,20 @@ public partial class BoardMap : TileMap
         // check if valid attack destination
         // profit?
     }
+
+	private void processAttackMarkers(Tile tile)
+	{
+		foreach (var neighbour in GetSurroundingCells(tile.Position))
+		{
+			if(lookup.TryGetValue(neighbour, out Tile neighbourTile))
+			{
+				if (neighbourTile.Piece != null && tile.Piece != null && neighbourTile.Piece.Team != tile.Piece.Team)
+				{
+                    SetCell((int)MapLayer.Highlight, neighbourTile.Position, 4, new Vector2I(0, 0), 0);
+                }
+			}
+		}
+	}
 
 	private void processTileSelection(Tile tile)
 	{
