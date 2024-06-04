@@ -29,6 +29,7 @@ public partial class BoardMap : TileMap
 	private GameMaster _gameMaster;
 
 	private Tile _selectedTile;
+	private Tile _destinationTile;
 
 	internal void createPiece(Vector2I location, PieceType type, Team team)
 	{
@@ -244,37 +245,60 @@ public partial class BoardMap : TileMap
 
         tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
 
-        if (tile.IsEmpty())
-			return;
-
-		if (tile.Piece.Team != Team.Blue)
-			return;
-
-		var piece = tile.Piece;
-
-		if (piece.Range < 1)
-			return;
-
-		if (piece.Range == 1)
+		if (_selectedTile == null)
 		{
-			SelectNormalPiece(tile);
+			// TODO mark valid attack choices
+            if (tile.IsEmpty())
+                return;
+
+            if (tile.Piece.Team != Team.Blue)
+                return;
+
+            var piece = tile.Piece;
+
+            if (piece.Range < 1)
+                return;
+
+            if (piece.Range == 1)
+            {
+                SelectNormalPiece(tile);
+                return;
+            }
+
+            SelectRangedPiece(tile);
+			return;
+        }
+
+        
+		if (
+			_destinationTile == null &&
+			tile.IsEmpty() && 
+			(tile.Position.X == _selectedTile.Position.X || tile.Position.Y == _selectedTile.Position.Y)
+		)
+		{
+            _destinationTile = tile;
+
+            var piece = _selectedTile.Piece;
+
+			_selectedTile.RemovePiece();
+            _destinationTile.AddPiece(piece);
+
+			// Notify end of turn available?
 			return;
 		}
 
-        SelectRangedPiece(tile);
 
-			
-		// TODO check if there is piece selected.
-			// if not check if piece can move
-				// select piece
-				// mark valid moves
-				// mark valid attack choices
-		// check if destination tile empty
-			// check if valid move
-				// move piece
-				// mark valid attack choices
-			// check if valid attack destination
-			// profit?
+        // TODO check if there is piece selected.
+        // if not check if piece can move
+        // select piece
+        // mark valid moves
+        // mark valid attack choices
+        // check if destination tile empty
+        // check if valid move
+        // move piece
+        // mark valid attack choices
+        // check if valid attack destination
+        // profit?
     }
 
 	private void ProcessSetupRightClick(Tile tile)
