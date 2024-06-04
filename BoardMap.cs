@@ -247,30 +247,11 @@ public partial class BoardMap : TileMap
 
 		if (_selectedTile == null)
 		{
-			// TODO mark valid attack choices
-            if (tile.IsEmpty())
-                return;
-
-            if (tile.Piece.Team != Team.Blue)
-                return;
-
-            var piece = tile.Piece;
-
-            if (piece.Range < 1)
-                return;
-
-            if (piece.Range == 1)
-            {
-                SelectNormalPiece(tile);
-                return;
-            }
-
-            SelectRangedPiece(tile);
+            processTileSelection(tile);
 			return;
         }
 
-        
-		if (
+        if (
 			_destinationTile == null &&
 			tile.IsEmpty() && 
 			(tile.Position.X == _selectedTile.Position.X || tile.Position.Y == _selectedTile.Position.Y)
@@ -287,6 +268,11 @@ public partial class BoardMap : TileMap
 			return;
 		}
 
+		if(!tile.IsEmpty())
+		{
+			_selectedTile = null;
+			processTileSelection(tile);
+        }
 
         // TODO check if there is piece selected.
         // if not check if piece can move
@@ -299,6 +285,30 @@ public partial class BoardMap : TileMap
         // mark valid attack choices
         // check if valid attack destination
         // profit?
+    }
+
+	private void processTileSelection(Tile tile)
+	{
+        // TODO mark valid attack choices
+        if (tile.IsEmpty())
+            return;
+
+        if (tile.Piece.Team != Team.Blue)
+            return;
+
+        var piece = tile.Piece;
+
+        if (piece.Range < 1)
+            return;
+
+        if (piece.Range == 1)
+        {
+            SelectNormalPiece(tile);
+            return;
+        }
+
+        SelectRangedPiece(tile);
+        return;
     }
 
 	private void ProcessSetupRightClick(Tile tile)
