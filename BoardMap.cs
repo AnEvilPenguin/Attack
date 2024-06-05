@@ -264,6 +264,7 @@ public partial class BoardMap : TileMap
 				Log.Debug("Piece selected");
 
 				turn.ClearMoves();
+                turn.ClearAttacks();
 
 				var selectedTile = turn.SelectedTile;
 				var moveTiles = GetTilesAtRange(selectedTile, selectedTile.Piece.Range, false);
@@ -274,6 +275,8 @@ public partial class BoardMap : TileMap
 					_gameMaster.CurrentTurn.AddMove(neighbourtile.Position, neighbourtile);
                 }
 				
+                processAttackMarkers(selectedTile, turn);
+
                 break;
 
 			case TurnAction.Move:
@@ -282,15 +285,9 @@ public partial class BoardMap : TileMap
 				turn.ClearMoves();
 				turn.ClearAttacks();
 
-				var destinationTile = turn.DestinationTile;
-                var attackTiles = GetTilesAtRange(destinationTile, 1, true)
-					.Where(t => t.Piece?.Team == Team.Red);
+				processAttackMarkers(turn.DestinationTile, turn);
 
-                foreach (var neighbourtile in attackTiles)
-                {
-                    SetCell((int)MapLayer.Highlight, neighbourtile.Position, 4, new Vector2I(0, 0), 0);
-                    _gameMaster.CurrentTurn.AddAttack(neighbourtile.Position, neighbourtile);
-                }
+				_gameMaster.CanCompleteTurn = true;
 
                 break;
 
@@ -305,19 +302,20 @@ public partial class BoardMap : TileMap
 		}
     }
 
-	private void processAttackMarkers(Tile tile)
+	private void processAttackMarkers(Tile tile, Turn turn)
 	{
-		foreach (var neighbour in GetSurroundingCells(tile.Position))
+		if (tile == null) 
+			return;
+
+        var attackTiles = GetTilesAtRange(tile, 1, true)
+            .Where(t => t.Piece?.Team == Team.Red);
+
+        foreach (var neighbourtile in attackTiles)
 		{
-			if(lookup.TryGetValue(neighbour, out Tile neighbourTile))
-			{
-				if (neighbourTile.Piece != null && tile.Piece != null && neighbourTile.Piece.Team != tile.Piece.Team)
-				{
-                    SetCell((int)MapLayer.Highlight, neighbourTile.Position, 4, new Vector2I(0, 0), 0);
+            SetCell((int)MapLayer.Highlight, neighbourtile.Position, 4, new Vector2I(0, 0), 0);
+            _gameMaster.CurrentTurn.AddAttack(neighbourtile.Position, neighbourtile);
                 }
 			}
-		}
-	}
 
 	private void ProcessSetupRightClick(Tile tile)
 	{
