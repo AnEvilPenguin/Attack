@@ -35,7 +35,7 @@ namespace Attack.Saves.SQLLite
         private const string createPositionsTableCommand =
             @"
                 CREATE TABLE 'Positions' (
-	                'Id'	INTEGER NOT NULL,
+	                'Id'	    INTEGER NOT NULL,
 	                'PieceId'	INTEGER NOT NULL,
 	                'GameId'	INTEGER NOT NULL,
 	                'StartX'	INTEGER NOT NULL,
@@ -49,17 +49,16 @@ namespace Attack.Saves.SQLLite
         private const string createTurnsTableCommand =
             @"
                 CREATE TABLE 'Turns' (
-	                'Id'	INTEGER NOT NULL,
-	                'Piece'	INTEGER NOT NULL,
-	                'Game'	INTEGER NOT NULL,
-	                'StartX'	INTEGER NOT NULL,
-	                'StartY'	INTEGER NOT NULL,
-	                'ExdX'	INTEGER,
-	                'EndY'	INTEGER,
-	                'Capture'	INTEGER,
+	                'Id'	        INTEGER NOT NULL,
+	                'Game'	        INTEGER NOT NULL,
+	                'StartX'	    INTEGER NOT NULL,
+	                'StartY'	    INTEGER NOT NULL,
+	                'ExdX'	        INTEGER,
+	                'EndY'	        INTEGER,
+                    'AttackX'       INTEGER,
+                    'AttackY'       INTEGER,
 	                'TurnNumber'	INTEGER,
-	                'DateTime'	TEXT,
-	                FOREIGN KEY('Capture') REFERENCES 'Pieces'('Id'),
+	                'DateTime'	    TEXT,
 	                FOREIGN KEY('Game') REFERENCES 'Games'('Id'),
 	                PRIMARY KEY('Id' AUTOINCREMENT)
                 );

@@ -25,6 +25,8 @@ namespace Attack.Game
         public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
 
+        public Turn CurrentTurn;
+
         private BoardMap _board;
         private Notification _notification;
 
@@ -117,6 +119,8 @@ namespace Attack.Game
 
             _notification.SendNotification($"{_gameInstance.StartingTeam} to start!");
             NotificationShowing = true;
+
+            CurrentTurn = new Turn(_gameInstance.StartingTeam);
         }
 
         public int GetPieceCount(PieceType pieceType) =>
