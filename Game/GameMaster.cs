@@ -5,8 +5,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Attack.Game
 {
@@ -134,6 +132,15 @@ namespace Attack.Game
 
                 var pieceSelector = GetNode<PieceSelector>("/root/Game/PieceSelector");
                 pieceSelector.DisableSettingButtons();
+
+                CurrentTurn = new Turn(_gameInstance.StartingTeam);
+
+                // Replay all previous turns
+
+                while (_protoTurns.Count > 0)
+                {
+                    _board.ReplayTurn(_protoTurns.Dequeue());
+                }
 
                 return;
             }
@@ -263,14 +270,24 @@ namespace Attack.Game
         public void RegisterNotification(Notification notification) =>
             _notification = notification;
 
-        public void CompleteTurn()
+        public void CompleteTurn(bool replay = false)
         {
-            Log.Information("End of turn");
+            // TODO entire forward/back feature.
+            if (replay)
+            {
+                Log.Debug("End of replay turn");
+            }
+            else
+            {
+                Log.Information("End of turn");
+            }
 
             _board.ClearAllOverlayElements();
 
-            _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
+            if (!replay)
+                _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
 
+            // push turn into stack here
             CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
 
             CanCompleteTurn = false;

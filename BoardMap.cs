@@ -370,4 +370,34 @@ public partial class BoardMap : TileMap
             EraseCell((int)MapLayer.Overlay, tile.Position);
         }
 	}
+
+	public void ReplayTurn(Vector2I[] turn)
+	{
+		// Convert into a turn and play it out.
+		
+		var start = turn[0];
+		// There will always be a start
+
+		Tile tile = lookup[start];
+		ProcessGameLeftClick(tile);
+	
+		var end = turn[1];
+
+		if (end != Vector2I.Zero)
+		{
+            tile = lookup[end];
+			ProcessGameLeftClick(tile);
+        }
+
+		var attack = turn[2];
+
+        if (attack != Vector2I.Zero)
+        {
+            tile = lookup[attack];
+            ProcessGameLeftClick(tile);
+        }
+
+		// End the turn
+		_gameMaster.CompleteTurn(true);
+    }
 }
