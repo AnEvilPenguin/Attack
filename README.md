@@ -8,7 +8,7 @@ The game is played on a tiled board, where there are a set number of hidden peic
 
 The player will be able to play against the computer. This will be a 2d no-frills game.
 The player must learn what pieces the computer has played and then maneuver their own in order to best it.
-To an extent there is a stone, parchment, shears element and feel to the game.
+To an extent there is a quartz, parchment, shears element and feel to the game.
 
 ## Platform
 The game is developed to be released on Windows PC.
