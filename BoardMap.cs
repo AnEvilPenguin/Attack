@@ -18,8 +18,6 @@ public partial class BoardMap : TileMap
 	[Export]
 	public PackedScene PieceScene { get; set; }
 
-	int GridSize = 12;
-
 	List<Tile> tiles = new List<Tile>();
 	Dictionary<Vector2I, Tile> lookup = new Dictionary<Vector2I, Tile>();
 
@@ -69,18 +67,19 @@ public partial class BoardMap : TileMap
 		Log.Debug("Readying board");
 
 		_offset = GlobalPosition;
+		int gridSize = Constants.GridSize;
 
-		for (int i = 0; i < GridSize; i++)
+		for (int i = 0; i < gridSize; i++)
 		{
-			for (int j = 0; j < GridSize; j++)
+			for (int j = 0; j < gridSize; j++)
 			{
 				// TODO Extract
 				TileType tileId = TileType.Terrain;
 
-				if (i == 0 || j == 0 || i == GridSize - 1 || j == GridSize - 1)
+				if (i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1)
 					tileId = TileType.Border;
 
-				bool startingTile = tileId == TileType.Terrain && j > GridSize - 6;
+				bool startingTile = tileId == TileType.Terrain && j > gridSize - 6;
 
 				var location = new Vector2I(i, j);
 
