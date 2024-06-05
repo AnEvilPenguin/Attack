@@ -50,7 +50,7 @@ namespace Attack.Game
                 SelectedTile = tile;
                 return TurnAction.Select;
             } 
-            else if (SelectedTile != null && tile.Piece?.Team == Team.Blue)
+            else if (SelectedTile != null && DestinationTile == null && tile.Piece?.Team == Team.Blue)
             {
                 // We've still got a valid selection here
                 if (tile.Piece.Range < 1)
