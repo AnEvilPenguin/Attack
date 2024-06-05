@@ -43,6 +43,8 @@ public partial class Notification : Control
 
 	public void AcceptButtonPressed()
 	{
+		Position = new Vector2(-100, -100); // Move offscreen to avoid tooltip issues
+
         Visible = false;
 		_gameMaster.NotificationShowing = false;
 		// TODO call back to master?

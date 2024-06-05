@@ -35,7 +35,7 @@ namespace Attack.Saves.SQLLite
         private const string createPositionsTableCommand =
             @"
                 CREATE TABLE 'Positions' (
-	                'Id'	INTEGER NOT NULL,
+	                'Id'	    INTEGER NOT NULL,
 	                'PieceId'	INTEGER NOT NULL,
 	                'GameId'	INTEGER NOT NULL,
 	                'StartX'	INTEGER NOT NULL,
@@ -49,23 +49,22 @@ namespace Attack.Saves.SQLLite
         private const string createTurnsTableCommand =
             @"
                 CREATE TABLE 'Turns' (
-	                'Id'	INTEGER NOT NULL,
-	                'Piece'	INTEGER NOT NULL,
-	                'Game'	INTEGER NOT NULL,
-	                'StartX'	INTEGER NOT NULL,
-	                'StartY'	INTEGER NOT NULL,
-	                'ExdX'	INTEGER,
-	                'EndY'	INTEGER,
-	                'Capture'	INTEGER,
-	                'TurnNumber'	INTEGER,
-	                'DateTime'	TEXT,
-	                FOREIGN KEY('Capture') REFERENCES 'Pieces'('Id'),
+	                'Id'	        INTEGER NOT NULL,
+	                'Game'	        INTEGER NOT NULL,
+	                'StartX'	    INTEGER NOT NULL,
+	                'StartY'	    INTEGER NOT NULL,
+	                'EndX'	        INTEGER,
+	                'EndY'	        INTEGER,
+                    'AttackX'       INTEGER,
+                    'AttackY'       INTEGER,
+	                'DateTime'	    TEXT,
 	                FOREIGN KEY('Game') REFERENCES 'Games'('Id'),
 	                PRIMARY KEY('Id' AUTOINCREMENT)
                 );
             ";
 
         private SaveGame _saveGame;
+        private SaveTurn _saveTurn;
 
         public SaveManager()
         {
@@ -73,6 +72,7 @@ namespace Attack.Saves.SQLLite
             _connectionString = $"Data Source={_databasePath}";
 
             _saveGame = new SaveGame();
+            _saveTurn = new SaveTurn();
         }
 
         public GameInstance NewGame() =>
@@ -86,6 +86,13 @@ namespace Attack.Saves.SQLLite
 
         public GameInstance LoadGame(int id) =>
             _saveGame.Load(id);
+
+        public void SaveGame(GameInstance game, Turn turn)
+        {
+            _saveTurn.Save(game, turn);
+            _saveGame.Save(game);
+        }
+            
 
         public void Initialize()
         {

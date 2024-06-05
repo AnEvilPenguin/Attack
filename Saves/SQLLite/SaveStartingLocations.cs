@@ -11,9 +11,7 @@ namespace Attack.Saves.SQLLite
 {
     internal class SaveStartingLocations : BaseSave
     {
-        public SaveStartingLocations()
-        {
-        }
+        public SaveStartingLocations() { }
 
         public bool HasStartLocations(GameInstance game)
         {

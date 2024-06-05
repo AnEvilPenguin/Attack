@@ -23,6 +23,13 @@ internal enum Team
     Blue
 }
 
+internal enum AttackResult
+{
+    Victory,
+    Defeat,
+    Stalemate
+}
+
 public partial class PieceNode : Node2D
 {
     private Team _team;
@@ -106,6 +113,8 @@ public partial class PieceNode : Node2D
 
     private Control _control;
 
+    public bool Spotted = false;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
@@ -124,5 +133,37 @@ public partial class PieceNode : Node2D
 	{
 	}
 
-    // Todo set shader colors?
+    internal AttackResult Attacks(PieceNode defender)
+    {
+        // TODO logic for showing icons and tooltips and the like (not here)
+        Spotted = true;
+        defender.Spotted = true;
+
+        switch (defender.PieceType)
+        {
+            case PieceType.Landmine:
+                return PieceType == PieceType.Engineer ?
+                    AttackResult.Victory :
+                    AttackResult.Defeat;
+
+            case PieceType.CommanderInChief:
+                return PieceType == PieceType.Spy ?
+                    AttackResult.Victory :
+                    AttackResult.Defeat;
+
+            case PieceType.Flag:
+                return AttackResult.Victory;
+
+            default:
+                var attackerValue = (int)PieceType;
+                var defenderValue = (int)defender.PieceType;
+
+                if (attackerValue == defenderValue)
+                    return AttackResult.Stalemate;
+                else if (attackerValue > defenderValue)
+                    return AttackResult.Victory;
+
+               return AttackResult.Defeat;
+        }
+    }
 }

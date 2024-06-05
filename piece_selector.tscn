@@ -70,6 +70,12 @@ layout_mode = 2
 disabled = true
 text = "Start Game"
 
+[node name="FinishTurn" type="Button" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+disabled = true
+text = "Finish Turn"
+
 [connection signal="pressed" from="VBoxContainer/Landmine" to="." method="OnButtonPressed" binds= [0]]
 [connection signal="pressed" from="VBoxContainer/Spy" to="." method="OnButtonPressed" binds= [1]]
 [connection signal="pressed" from="VBoxContainer/Scout" to="." method="OnButtonPressed" binds= [2]]
@@ -83,3 +89,4 @@ text = "Start Game"
 [connection signal="pressed" from="VBoxContainer/CommanderInChief" to="." method="OnButtonPressed" binds= [10]]
 [connection signal="pressed" from="VBoxContainer/Flag" to="." method="OnButtonPressed" binds= [11]]
 [connection signal="pressed" from="VBoxContainer/StartGame" to="." method="OnStartButtonPressed"]
+[connection signal="pressed" from="VBoxContainer/FinishTurn" to="." method="OnFinishTurnPressed"]

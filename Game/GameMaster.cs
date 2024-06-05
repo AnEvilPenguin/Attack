@@ -22,7 +22,10 @@ namespace Attack.Game
         private GameInstance _gameInstance;
 
         public bool GameStarted = false;
+        public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
+
+        public Turn CurrentTurn;
 
         private BoardMap _board;
         private Notification _notification;
@@ -45,6 +48,12 @@ namespace Attack.Game
             _initialized = true;
 
             Log.Debug("Game Master Initialized");
+        }
+
+        // Called every frame. 'delta' is the elapsed time since the previous frame.
+        public override void _Process(double delta)
+        {
+            // TODO if AI turn and not in progress kick off that logic
         }
 
         public void New()
@@ -116,6 +125,8 @@ namespace Attack.Game
 
             _notification.SendNotification($"{_gameInstance.StartingTeam} to start!");
             NotificationShowing = true;
+
+            CurrentTurn = new Turn(_gameInstance.StartingTeam);
         }
 
         public int GetPieceCount(PieceType pieceType) =>
@@ -169,5 +180,18 @@ namespace Attack.Game
 
         public void RegisterNotification(Notification notification) =>
             _notification = notification;
+
+        public void CompleteTurn()
+        {
+            Log.Information("End of turn");
+
+            _board.ClearAllOverlayElements();
+
+            _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
+
+            CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
+
+            CanCompleteTurn = false;
+        }
     }
 }

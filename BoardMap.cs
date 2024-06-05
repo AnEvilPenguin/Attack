@@ -4,7 +4,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public partial class BoardMap : TileMap
 {
@@ -27,8 +26,6 @@ public partial class BoardMap : TileMap
 	private Vector2 _offset;
 
 	private GameMaster _gameMaster;
-
-	private Tile _selectedTile;
 
 	internal void createPiece(Vector2I location, PieceType type, Team team)
 	{
@@ -100,7 +97,9 @@ public partial class BoardMap : TileMap
 	{
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
-		if (_selectedTile == null)
+		var turn = _gameMaster.CurrentTurn;
+
+		if (turn == null || turn.SelectedTile == null)
             tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
 
         if (_gameMaster.NotificationShowing)
@@ -138,7 +137,7 @@ public partial class BoardMap : TileMap
 
 			if (_gameMaster.GameStarted)
             {
-                ProcessGameRightClick(tile);
+                ProcessGameRightClick();
                 return;
             }
 
@@ -166,43 +165,55 @@ public partial class BoardMap : TileMap
         Log.Debug("Completed placement of tile");
     }
 
-	private void SelectNormalPiece(Tile tile)
-	{
-        var location = tile.Position;
-
-        var neighbours = GetSurroundingCells(location);
-
-        foreach (var neighbor in neighbours)
-        {
-            if (!lookup.TryGetValue(neighbor, out Tile neighbourTile))
-                continue;
-
-            if (neighbourTile.IsEmpty())
-            {
-                SetCell((int)MapLayer.Highlight, neighbor, 3, new Vector2I(0, 0), 0);
-                _selectedTile = tile;
-            }
-        }
-    }
-
-	private void SelectRangedPiece(Tile tile)
+	private List<Tile> GetTilesAtRange(Tile tile, int range, bool includePieces)
 	{
         var tiles = new List<Tile>();
-        var piece = tile.Piece;
 
-		tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.RightSide, tiles);
-        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.LeftSide, tiles);
-        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.TopSide, tiles);
-        tiles = GetTileRange(tile, piece.Range, TileSet.CellNeighbor.BottomSide, tiles);
+        tiles = GetTilesAtRange(tile, range, TileSet.CellNeighbor.RightSide, tiles, includePieces);
+        tiles = GetTilesAtRange(tile, range, TileSet.CellNeighbor.LeftSide, tiles, includePieces);
+        tiles = GetTilesAtRange(tile, range, TileSet.CellNeighbor.TopSide, tiles, includePieces);
+        tiles = GetTilesAtRange(tile, range, TileSet.CellNeighbor.BottomSide, tiles, includePieces);
 
-		foreach (var neighbor in tiles)
-		{
-            SetCell((int)MapLayer.Highlight, neighbor.Position, 3, new Vector2I(0, 0), 0);
+		return tiles;
+    }
 
-			if (_selectedTile == null)
-				_selectedTile = tile;
-        }
+	private List<Tile> GetTilesAtRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles, bool includePieces)
+	{
+        bool canContinue = true;
 
+        do
+        {
+            if (--range == 0)
+                canContinue = false;
+
+			// TODO consider extracting a lot of this
+            var neighbor = GetNeighborCell(tile.Position, direction);
+
+            if (lookup.TryGetValue(neighbor, out Tile neighbourTile))
+            {
+				if (!includePieces && neighbourTile.Type == TileType.Terrain)
+				{
+                    tiles.Add(neighbourTile);
+                    tile = neighbourTile;
+                }
+                else if (includePieces && (neighbourTile.Type == TileType.Piece || neighbourTile.Type == TileType.Terrain))
+                {
+                    tiles.Add(neighbourTile);
+                    tile = neighbourTile;
+                }
+                else
+                {
+                    canContinue = false;
+                }
+            }
+            else
+            {
+                canContinue = false;
+            }
+
+        } while (canContinue);
+
+        return tiles;
     }
 
 	private List<Tile> GetTileRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles)
@@ -244,37 +255,68 @@ public partial class BoardMap : TileMap
 
         tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
 
-        if (tile.IsEmpty())
-			return;
+		var turn = _gameMaster.CurrentTurn;
+		var turnAction = turn.ProcessLeftClick(tile, tile.Position);
 
-		if (tile.Piece.Team != Team.Blue)
-			return;
-
-		var piece = tile.Piece;
-
-		if (piece.Range < 1)
-			return;
-
-		if (piece.Range == 1)
+		switch (turnAction)
 		{
-			SelectNormalPiece(tile);
-			return;
+			case TurnAction.Select:
+				Log.Debug("Piece selected");
+
+				turn.ClearMoves();
+                turn.ClearAttacks();
+
+                var selectedTile = turn.SelectedTile;
+				var moveTiles = GetTilesAtRange(selectedTile, selectedTile.Piece.Range, false);
+
+				foreach (var neighbourtile in moveTiles)
+				{
+                    SetCell((int)MapLayer.Highlight, neighbourtile.Position, 3, new Vector2I(0, 0), 0);
+					_gameMaster.CurrentTurn.AddMove(neighbourtile.Position, neighbourtile);
+                }
+
+                processAttackMarkers(selectedTile, turn);
+
+                break;
+
+			case TurnAction.Move:
+				Log.Debug("Move action");
+
+				turn.ClearMoves();
+				turn.ClearAttacks();
+
+				processAttackMarkers(turn.DestinationTile, turn);
+
+				_gameMaster.CanCompleteTurn = true;
+
+                break;
+
+			case TurnAction.Attack:
+				Log.Debug("End of turn");
+
+				// No take backsies
+				_gameMaster.CompleteTurn();
+				return;
+
+			case TurnAction.Invalid:
+				Log.Debug("Invalid action");
+				return;
 		}
+    }
 
-        SelectRangedPiece(tile);
+	private void processAttackMarkers(Tile tile, Turn turn)
+	{
+		if (tile == null) 
+			return;
 
-			
-		// TODO check if there is piece selected.
-			// if not check if piece can move
-				// select piece
-				// mark valid moves
-				// mark valid attack choices
-		// check if destination tile empty
-			// check if valid move
-				// move piece
-				// mark valid attack choices
-			// check if valid attack destination
-			// profit?
+        var attackTiles = GetTilesAtRange(tile, 1, true)
+            .Where(t => t.Piece?.Team == Team.Red);
+
+        foreach (var neighbourtile in attackTiles)
+        {
+            SetCell((int)MapLayer.Highlight, neighbourtile.Position, 4, new Vector2I(0, 0), 0);
+            _gameMaster.CurrentTurn.AddAttack(neighbourtile.Position, neighbourtile);
+        }
     }
 
 	private void ProcessSetupRightClick(Tile tile)
@@ -301,9 +343,18 @@ public partial class BoardMap : TileMap
         }
     }
 
-	private void ProcessGameRightClick(Tile tile)
+	private void ProcessGameRightClick()
 	{
-		Log.Debug("Right click in game");
-		_selectedTile = null;
+		_gameMaster.CurrentTurn.ProcessRightClick();
+        _gameMaster.CanCompleteTurn = false;
+    }
+
+	public void ClearAllOverlayElements()
+	{
+		foreach (var tile in tiles)
+		{
+            EraseCell((int)MapLayer.Highlight, tile.Position);
+            EraseCell((int)MapLayer.Overlay, tile.Position);
+        }
 	}
 }
