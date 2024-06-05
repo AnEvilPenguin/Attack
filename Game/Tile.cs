@@ -83,6 +83,24 @@ namespace Attack.Game
             return list;
         }
 
+        public List<Vector2I> GetOtherRowAndColumnLocations()
+        {
+            var list = new List<Vector2I>();
+
+            for (int i = 1; i < Constants.GridSize -1; i++)
+            {
+                var x = new Vector2I(i, Position.Y);
+                var y = new Vector2I(Position.X, i);
+
+                if (x != Position)
+                    list.Add(x);
+                if (y != Position)
+                    list.Add(y);
+            }
+
+            return list;
+        }
+
         private bool IsValidLocation(Vector2I location) =>
             location.X > 0 &&
             location.Y > 0 &&
