@@ -105,13 +105,13 @@ As a stretch goal we can consider keyboard/controller.
 ## MVP
 
 - [X] Design Document
-- [ ] Placeholder Art Assets
+- [X] Placeholder Art Assets
 - [X] Main Menu
-- [ ] Level and Game Implementation
+- [X] Level and Game Implementation
 - [ ] Pause menu
-- [ ] Save Game/Load Game system
-- [ ] Piece selection and movement
-- [ ] Basic Piece combat
+- [X] Save Game/Load Game system
+- [X] Piece selection and movement
+- [X] Basic Piece combat
 - [ ] Full Piece implementation
 - [ ] Player Transition
 - [ ] Computer player
@@ -122,6 +122,6 @@ As a stretch goal we can consider keyboard/controller.
 - [ ] Computer Difficulty settings
 - [ ] Capture effects
 - [ ] In game history (Show previous turns)?
-- [ ] Full screen toggle
+- [X] Full screen toggle
 - [ ] Additional level designs (Lakes, valley, etc.)
 - [ ] Audio Assets
