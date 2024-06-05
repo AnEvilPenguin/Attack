@@ -46,6 +46,9 @@ namespace Attack.Saves.SQLLite
 
         public void Delete(GameInstance game)
         {
+            if (game == null)
+                return;
+
             Log.Warning($"Deleting game instance {game.Id}");
 
             using (var connection = new SqliteConnection(_connectionString))
