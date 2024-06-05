@@ -118,6 +118,8 @@ public partial class BoardMap : TileMap
         if (_gameMaster.NotificationShowing)
 			return;
 
+		// TODO if AI turn kick that process off and ignore player input
+
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
 
