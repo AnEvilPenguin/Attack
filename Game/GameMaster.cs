@@ -181,8 +181,6 @@ namespace Attack.Game
                 piece.QueueFree();
             }
 
-
-
             // TODO replay turns
         }
 
@@ -238,21 +236,6 @@ namespace Attack.Game
                 .Keys
                 .Any(k => _playerPieceCount[k] != Constants.PieceLimits[k]);
 
-        // LoadGame index
-        // Place pieces
-        // Load history to replayed stack in order
-        // Play out turns (if any) to get final locations
-        // Load pieces to board
-
-
-        // LoadGame
-        // Find latest index (incomplete) and load that
-
-        // database pieces - id, type
-        // database turns - id, startPosition, endPosition, capture, team
-        // database - game with id
-        // piece postions - gameid, pieceid, position
-
         public override void _Notification(int what)
         {
             if (what == NotificationWMCloseRequest)
@@ -287,7 +270,7 @@ namespace Attack.Game
             if (!replay)
                 _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
 
-            // push turn into stack here
+            // TODO push turn into stack here
             CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
 
             CanCompleteTurn = false;

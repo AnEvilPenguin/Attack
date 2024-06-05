@@ -379,10 +379,11 @@ public partial class BoardMap : TileMap
 		// There will always be a start
 
 		Tile tile = lookup[start];
-		ProcessGameLeftClick(tile);
+		ProcessGameLeftClick(tile); // probably a bodge
 	
 		var end = turn[1];
 
+		// Zero is always off map so never valid
 		if (end != Vector2I.Zero)
 		{
             tile = lookup[end];
