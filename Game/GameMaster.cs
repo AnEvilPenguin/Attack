@@ -25,6 +25,8 @@ namespace Attack.Game
         public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
 
+        private int _latestGameId = -1;
+
         public Turn CurrentTurn;
 
         private BoardMap _board;
@@ -54,6 +56,18 @@ namespace Attack.Game
         public override void _Process(double delta)
         {
             // TODO if AI turn and not in progress kick off that logic
+        }
+
+        public bool CanLoadGames()
+        {
+            _latestGameId = _sqlSaveManager.GetLatestSaveId();
+
+            return _latestGameId != -1;
+        }
+
+        public void Continue()
+        {
+            // Get latest
         }
 
         public void New()
@@ -93,6 +107,8 @@ namespace Attack.Game
 
 
             Log.Debug("Loading game board");
+
+            _latestGameId = _gameInstance.Id;
 
             GetTree().ChangeSceneToFile("res://game.tscn");
         }

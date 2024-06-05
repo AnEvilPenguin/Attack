@@ -204,5 +204,33 @@ namespace Attack.Saves.SQLLite
         {
             throw new NotImplementedException();
         }
+
+        public int GetLatestId()
+        {
+            Log.Information("Getting latest game");
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        SELECT Id FROM Games
+                        WHERE CompletedDate IS NULL
+                        ORDER BY UpdateDate DESC
+                        LIMIT 1
+                    ";
+
+                try 
+                {
+                    return (int)(float)command.ExecuteScalar();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to retrieve latest game");
+                    return -1;
+                }
+            }
+        }
     }
 }

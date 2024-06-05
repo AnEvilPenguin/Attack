@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Attack.Util;
 using Serilog;
+using Godot;
 
 namespace Attack.Saves.SQLLite
 {
@@ -79,6 +80,64 @@ namespace Attack.Saves.SQLLite
                     throw;
                 }
             }
+        }
+
+        public Queue<Vector2I[]> Load(GameInstance game)
+        {
+            var queue = new Queue<Vector2I[]>();
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        SELECT * FROM Turns
+                        WHERE GameId = $Id
+                        ORDER BY Id
+                    ";
+
+                command.Parameters.AddWithValue("$Id", game.Id);
+
+                SqliteDataReader reader;
+
+                try
+                {
+                    reader = command.ExecuteReader();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Failed to read game turns for {game.Id}");
+                    throw;
+                }
+
+                while (reader.Read())
+                {
+                    var arr = new Vector2I[2];
+
+                    int startX = (int)(float)reader.GetValue(2);
+                    int startY = (int)(float)reader.GetValue(3);
+
+                    arr[0] = new Vector2I(startX, startY);
+
+                    // FIXME These may not exist
+                    var endX = (int)(float)reader.GetValue(4);
+                    var endY = (int)(float)reader.GetValue(5);
+
+                    arr[1] = new Vector2I(endX, endY);
+
+                    var attackX = (int)(float)reader.GetValue(6);
+                    var attackY = (int)(float)reader.GetValue(7);
+
+                    arr[2] = new Vector2I(attackX, attackY);
+
+                    queue.Enqueue(arr);
+                }
+            }
+
+            return queue;
         }
     }
 }

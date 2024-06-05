@@ -92,6 +92,9 @@ namespace Attack.Saves.SQLLite
             _saveTurn.Save(game, turn);
             _saveGame.Save(game);
         }
+
+        public int GetLatestSaveId() =>
+            _saveGame.GetLatestId();
             
 
         public void Initialize()

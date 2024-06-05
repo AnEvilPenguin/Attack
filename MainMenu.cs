@@ -15,6 +15,20 @@ public partial class MainMenu : Control
         Log.Information("Loading main menu");
         var container = GetNode<VBoxContainer>("VBoxContainer");
 
+        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
+
+
+        if (_gameMaster.CanLoadGames())
+        {
+            Log.Debug("Can load games");
+
+            var continueButton = GetNode<Button>("VBoxContainer/ContinueButton");
+            var loadButton = GetNode<Button>("VBoxContainer/LoadGameButton");
+
+            continueButton.Disabled = false;
+            loadButton.Disabled = false;
+        }
+
         container.GetChildren()
             .OfType<Button>()
             .First(c => !c.Disabled)
@@ -22,8 +36,6 @@ public partial class MainMenu : Control
 
         OptionsManager.Load();
         Log.Debug("Main menu loaded");
-
-        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
     }
 
     public void OnContinuePressed()
