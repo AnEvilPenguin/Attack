@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using Attack.Util;
+using Godot;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -60,5 +61,33 @@ namespace Attack.Game
         }
 
         public bool IsEmpty() => Piece == null & Type == TileType.Terrain;
+
+        public List<Vector2I> GetNeighbours()
+        {
+            var list = new List<Vector2I>();
+
+            Vector2I north = Position - new Vector2I(0, 1);
+            Vector2I east = Position - new Vector2I(1, 0);
+            Vector2I south = Position + new Vector2I(0, 1);
+            Vector2I west = Position + new Vector2I(1, 0);
+
+            if(IsValidLocation(north))
+                list.Add(north);
+            if(IsValidLocation(east))
+                list.Add(east);
+            if (IsValidLocation(south))
+                list.Add(south);
+            if (IsValidLocation(west))
+                list.Add(west);
+
+            return list;
+        }
+
+        private bool IsValidLocation(Vector2I location) =>
+            location.X > 0 &&
+            location.Y > 0 &&
+            location.X < Constants.GridSize - 1 &&
+            location.Y < Constants.GridSize - 1;
+
     }
 }
