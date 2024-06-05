@@ -53,7 +53,7 @@ namespace Attack.Saves.SQLLite
 	                'Game'	        INTEGER NOT NULL,
 	                'StartX'	    INTEGER NOT NULL,
 	                'StartY'	    INTEGER NOT NULL,
-	                'ExdX'	        INTEGER,
+	                'EndX'	        INTEGER,
 	                'EndY'	        INTEGER,
                     'AttackX'       INTEGER,
                     'AttackY'       INTEGER,
