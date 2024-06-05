@@ -211,6 +211,8 @@ namespace Attack.Saves.SQLLite
 
             using (var connection = new SqliteConnection(_connectionString))
             {
+                connection.Open();
+
                 var command = connection.CreateCommand();
 
                 command.CommandText =
@@ -223,7 +225,7 @@ namespace Attack.Saves.SQLLite
 
                 try 
                 {
-                    return (int)(float)command.ExecuteScalar();
+                    return (int)(long)command.ExecuteScalar();
                 }
                 catch (Exception ex)
                 {
@@ -232,5 +234,8 @@ namespace Attack.Saves.SQLLite
                 }
             }
         }
+
+        public List<PieceNode> LoadPieces(GameInstance game) =>
+            _startingLocations.Load(game);
     }
 }

@@ -41,6 +41,8 @@ public partial class MainMenu : Control
     public void OnContinuePressed()
     {
         Log.Debug("Continue");
+
+        _gameMaster.Continue();
     }
 
     public void OnLoadGamePressed()

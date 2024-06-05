@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using Attack.Game;
+using Godot;
 
 namespace Attack.Saves.SQLLite
 {
@@ -95,7 +96,13 @@ namespace Attack.Saves.SQLLite
 
         public int GetLatestSaveId() =>
             _saveGame.GetLatestId();
-            
+
+        public Queue<Vector2I[]> LoadTurns(GameInstance game) =>
+            _saveTurn.Load(game);
+
+        public List<PieceNode> LoadPieces(GameInstance game) =>
+            _saveGame.LoadPieces(game);
+
 
         public void Initialize()
         {

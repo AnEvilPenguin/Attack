@@ -27,7 +27,7 @@ public partial class BoardMap : TileMap
 
 	private GameMaster _gameMaster;
 
-	internal void createPiece(Vector2I location, PieceType type, Team team)
+	internal void CreatePiece(Vector2I location, PieceType type, Team team)
 	{
 		Tile tile;
 
@@ -45,6 +45,16 @@ public partial class BoardMap : TileMap
         tile.AddPiece(piece);
 
 		Log.Debug("Completed creating piece");
+    }
+
+	internal void AddPiece(PieceNode piece)
+	{
+		var location = (Vector2I)piece.Position;
+        lookup.TryGetValue(location, out Tile tile);
+
+		AddChild(piece);
+
+		tile.AddPiece(piece);
     }
 
 	internal List<Tile> ListPieces() =>
@@ -85,16 +95,19 @@ public partial class BoardMap : TileMap
 		}
 
 		Log.Debug("Completed readying board");
-
-        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
-
-		_gameMaster.CreateGame(this);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	// TODO clean up this mess
 	public override void _Process(double delta)
 	{
+		if (_gameMaster == null)
+		{
+            _gameMaster = GetNode<GameMaster>("/root/GameMaster");
+
+            _gameMaster.CreateGame(this);
+        }
+
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
 		var turn = _gameMaster.CurrentTurn;

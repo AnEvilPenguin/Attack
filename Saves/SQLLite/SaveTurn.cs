@@ -95,7 +95,7 @@ namespace Attack.Saves.SQLLite
                 command.CommandText =
                     @"
                         SELECT * FROM Turns
-                        WHERE GameId = $Id
+                        WHERE Game = $Id
                         ORDER BY Id
                     ";
 
@@ -115,23 +115,36 @@ namespace Attack.Saves.SQLLite
 
                 while (reader.Read())
                 {
-                    var arr = new Vector2I[2];
+                    var arr = new Vector2I[3];
 
-                    int startX = (int)(float)reader.GetValue(2);
-                    int startY = (int)(float)reader.GetValue(3);
+                    int id = (int)(long)reader.GetValue(0);
 
-                    arr[0] = new Vector2I(startX, startY);
+                    Log.Debug($"Loading turn {id} of game {game.Id}");
+
+                    var startX = reader.GetValue(2);
+                    var startY = reader.GetValue(3);
+
+                    if (startX is not DBNull)
+                    {
+                        arr[0] = new Vector2I((int)(long)startX, (int)(long)startY);
+                    }
 
                     // FIXME These may not exist
-                    var endX = (int)(float)reader.GetValue(4);
-                    var endY = (int)(float)reader.GetValue(5);
+                    var endX = reader.GetValue(4);
+                    var endY = reader.GetValue(5);
 
-                    arr[1] = new Vector2I(endX, endY);
+                    if (endX is not DBNull)
+                    {
+                        arr[1] = new Vector2I((int)(long)endX, (int)(long)endY);
+                    }
 
-                    var attackX = (int)(float)reader.GetValue(6);
-                    var attackY = (int)(float)reader.GetValue(7);
+                    var attackX = reader.GetValue(6);
+                    var attackY = reader.GetValue(7);
 
-                    arr[2] = new Vector2I(attackX, attackY);
+                    if (attackX is not DBNull)
+                    {
+                        arr[2] = new Vector2I((int)(long)attackX, (int)(long)attackY);
+                    }
 
                     queue.Enqueue(arr);
                 }
