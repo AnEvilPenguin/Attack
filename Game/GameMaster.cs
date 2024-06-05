@@ -181,6 +181,8 @@ namespace Attack.Game
                 piece.QueueFree();
             }
 
+            GameStarted = true;
+
             // TODO replay turns
         }
 
