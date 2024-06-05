@@ -2,9 +2,6 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Attack.Game
 {
@@ -85,7 +82,37 @@ namespace Attack.Game
                 return TurnAction.Move;
             }
 
-            // TODO attack
+            if (AttackedTile == null && ValidAttacks.ContainsKey(cell))
+            {
+                AttackedTile = tile;
+
+                bool defenderIsFlag = tile.Piece.PieceType == PieceType.Flag;
+
+                Tile aggressor = DestinationTile != null ?
+                    DestinationTile :
+                    SelectedTile;
+
+                var result = aggressor.Piece.Attacks(tile.Piece);
+
+                if (result == AttackResult.Victory)
+                {
+                    var piece = tile.Piece;
+                    
+                    tile.RemovePiece();
+                    piece.QueueFree();
+                }
+                else if (result == AttackResult.Defeat)
+                {
+                    var piece = aggressor.Piece;
+
+                    aggressor.RemovePiece();
+                    piece.QueueFree();
+                }
+                    
+                // TODO handle case where flag is captured;
+
+                return TurnAction.Attack;
+            }
 
             if (DestinationTile != null)
                 return TurnAction.Move;

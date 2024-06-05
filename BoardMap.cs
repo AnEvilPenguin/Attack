@@ -294,22 +294,15 @@ public partial class BoardMap : TileMap
 
                 break;
 
+			case TurnAction.Attack:
+				Log.Debug("End of turn");
+				// TODO this
+				return;
+
 			case TurnAction.Invalid:
 				Log.Debug("Invalid action");
 				return;
 		}
-
-        // TODO check if there is piece selected.
-        // if not check if piece can move
-        // select piece
-        // mark valid moves
-        // mark valid attack choices
-        // check if destination tile empty
-        // check if valid move
-        // move piece
-        // mark valid attack choices
-        // check if valid attack destination
-        // profit?
     }
 
 	private void processAttackMarkers(Tile tile)
