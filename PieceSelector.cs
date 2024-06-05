@@ -114,6 +114,11 @@ public partial class PieceSelector : Control
 
         _gameMaster.StartGame();
 
+        DisableSettingButtons();
+    }
+
+    public void DisableSettingButtons()
+    {
         _startButton.Disabled = true;
 
         _landmineButton.Visible = false;
