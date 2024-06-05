@@ -2,7 +2,7 @@
 
 Takes inspiration from L'Attaque and another similar but unnamed strategy board game.
 
-The game is played on a tiled board, where there are a set number of hidden peices (of varying rank and capability). The player will be expected to 'scout' out the pieces placed by the opposition and will need to react to chaging information. The game is won when a player captures the flag of the opposing player.
+The game is played on a tiled board, where there are a set number of hidden peices (of varying rank and capability). The player will be expected to 'scout' out the pieces placed by the opposition and will need to react to changing information. The game is won when a player captures the flag of the opposing player.
 
 ## Player Experience
 
