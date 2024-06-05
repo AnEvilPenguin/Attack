@@ -5,8 +5,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Attack.Game
 {
@@ -24,6 +22,12 @@ namespace Attack.Game
         public bool GameStarted = false;
         public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
+        public bool LoadGame = false;
+
+        private List<PieceNode> _initialPlacements;
+        private Queue<Vector2I[]> _protoTurns;
+
+        private int _latestGameId = -1;
 
         public Turn CurrentTurn;
 
@@ -56,6 +60,38 @@ namespace Attack.Game
             // TODO if AI turn and not in progress kick off that logic
         }
 
+        public bool CanLoadGames()
+        {
+            _latestGameId = _sqlSaveManager.GetLatestSaveId();
+
+            return _latestGameId != -1;
+        }
+
+        public void Continue()
+        {
+            _latestGameId = _sqlSaveManager.GetLatestSaveId();
+
+            if (_latestGameId == -1)
+            {
+                Log.Error("Games not loadable (how are we here?)");
+                return;
+            }
+
+            Load(_latestGameId);
+        }
+
+        public void Load(int id)
+        {
+            _gameInstance = _sqlSaveManager.LoadGame(_latestGameId);
+
+            _initialPlacements = _sqlSaveManager.LoadPieces(_gameInstance);
+            _protoTurns = _sqlSaveManager.LoadTurns(_gameInstance);
+
+            LoadGame = true;
+
+            GetTree().ChangeSceneToFile("res://game.tscn");
+        }
+
         public void New()
         {
             Log.Debug("Creating new game");
@@ -75,6 +111,80 @@ namespace Attack.Game
 
             _sqlSaveManager.SaveGame(_gameInstance);
 
+            GeneratePlayerPieceCount();
+
+            Log.Debug("Loading game board");
+
+            _latestGameId = _gameInstance.Id;
+
+            GetTree().ChangeSceneToFile("res://game.tscn");
+        }
+
+        public void CreateGame(BoardMap board)
+        {
+            _board = board;
+
+            if (LoadGame)
+            {
+                Log.Debug("Loading game from save data");
+
+                LoadGameDataToBoard();
+
+                var pieceSelector = GetNode<PieceSelector>("/root/Game/PieceSelector");
+                pieceSelector.DisableSettingButtons();
+
+                CurrentTurn = new Turn(_gameInstance.StartingTeam);
+
+                // Replay all previous turns
+
+                while (_protoTurns.Count > 0)
+                {
+                    _board.ReplayTurn(_protoTurns.Dequeue());
+                }
+
+                return;
+            }
+
+            Log.Debug("Creating game from presets");
+
+            LoadGamePresetToBoard();
+
+            Log.Debug("Completed creating game");
+        }
+
+        private void LoadGamePresetToBoard()
+        {
+            foreach (var pieceConfig in Presets.StandardSetup.Locations)
+            {
+                var location = pieceConfig.Item1;
+                var pieceType = pieceConfig.Item2;
+
+                _board.CreatePiece(location, pieceType, Team.Red);
+            }
+        }
+
+        private void LoadGameDataToBoard()
+        {
+            GeneratePlayerPieceCount();
+
+            // This loop is the other half of a giant bodge.
+            // We need to instantiate the piece from the board otherwise we lose things like shaders and materials.
+            // Otherwise I need to create that from code from scratch
+            //     (as I should do next time I intend to do this sort of thing)
+            foreach (var piece in _initialPlacements) 
+            {
+                _board.CreatePiece((Vector2I)piece.Position, piece.PieceType, piece.Team);
+
+                if(piece.Team == Team.Blue)
+                    _playerPieceCount[piece.PieceType]++;
+
+                piece.QueueFree();
+            }
+
+            // TODO replay turns
+        }
+
+        private void GeneratePlayerPieceCount() =>
             _playerPieceCount = new Dictionary<PieceType, int>
             {
                 { PieceType.Landmine, 0 },
@@ -90,29 +200,6 @@ namespace Attack.Game
                 { PieceType.CommanderInChief, 0 },
                 { PieceType.Flag, 0 },
             };
-
-
-            Log.Debug("Loading game board");
-
-            GetTree().ChangeSceneToFile("res://game.tscn");
-        }
-
-        public void CreateGame(BoardMap board)
-        {
-            Log.Debug("Creating game from presets");
-
-            _board = board;
-
-            foreach (var pieceConfig in Presets.StandardSetup.Locations)
-            {
-                var location = pieceConfig.Item1;
-                var pieceType = pieceConfig.Item2;
-
-                _board.createPiece(location, pieceType, Team.Red);
-            }
-
-            Log.Debug("Completed creating game");
-        }
 
         public void StartGame()
         {
@@ -149,21 +236,6 @@ namespace Attack.Game
                 .Keys
                 .Any(k => _playerPieceCount[k] != Constants.PieceLimits[k]);
 
-        // LoadGame index
-        // Place pieces
-        // Load history to replayed stack in order
-        // Play out turns (if any) to get final locations
-        // Load pieces to board
-
-
-        // LoadGame
-        // Find latest index (incomplete) and load that
-
-        // database pieces - id, type
-        // database turns - id, startPosition, endPosition, capture, team
-        // database - game with id
-        // piece postions - gameid, pieceid, position
-
         public override void _Notification(int what)
         {
             if (what == NotificationWMCloseRequest)
@@ -181,14 +253,24 @@ namespace Attack.Game
         public void RegisterNotification(Notification notification) =>
             _notification = notification;
 
-        public void CompleteTurn()
+        public void CompleteTurn(bool replay = false)
         {
-            Log.Information("End of turn");
+            // TODO entire forward/back feature.
+            if (replay)
+            {
+                Log.Debug("End of replay turn");
+            }
+            else
+            {
+                Log.Information("End of turn");
+            }
 
             _board.ClearAllOverlayElements();
 
-            _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
+            if (!replay)
+                _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
 
+            // TODO push turn into stack here
             CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
 
             CanCompleteTurn = false;

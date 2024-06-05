@@ -54,21 +54,7 @@ public partial class PieceNode : Node2D
         {
             _team = value;
 
-            if (_team == Team.Red)
-            {
-                //var propertyList = _material.GetPropertyList();
-                //var color1 = _material.Get("shader_parameter/color1");
-
-                _material.Set("shader_parameter/color1", red1);
-                _material.Set("shader_parameter/color2", red2);
-                _material.Set("shader_parameter/color3", red3);
-            }
-            else
-            {
-                _material.Set("shader_parameter/color1", blue1);
-                _material.Set("shader_parameter/color2", blue2);
-                _material.Set("shader_parameter/color3", blue3);
-            }
+            setShaderColor();
         }
     }
 
@@ -87,8 +73,9 @@ public partial class PieceNode : Node2D
         
         set 
         { 
-            _pieceType = value; 
-            _control.TooltipText = $"{value} ({(int)value})"; // TODO only show tooltip if piece is 'exposed'
+            _pieceType = value;
+
+            setTooltipText();
 
             switch (_pieceType) 
             {
@@ -126,12 +113,45 @@ public partial class PieceNode : Node2D
         // This prevents changes to the shader being applied to all pieces at once.
         _material = _sprite.Material.Duplicate() as ShaderMaterial;
         _sprite.Material = _material;
+
+        setTooltipText();
+        setShaderColor();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-	}
+    }
+
+    private void setTooltipText()
+    {
+        if (_control == null)
+            return;
+
+        _control.TooltipText = $"{_pieceType} ({(int)_pieceType})"; // TODO only show tooltip if piece is 'exposed'
+    }
+
+    private void setShaderColor()
+    {
+        if(_material == null)
+            return;
+
+        if (_team == Team.Red)
+        {
+            //var propertyList = _material.GetPropertyList();
+            //var color1 = _material.Get("shader_parameter/color1");
+
+            _material.Set("shader_parameter/color1", red1);
+            _material.Set("shader_parameter/color2", red2);
+            _material.Set("shader_parameter/color3", red3);
+        }
+        else
+        {
+            _material.Set("shader_parameter/color1", blue1);
+            _material.Set("shader_parameter/color2", blue2);
+            _material.Set("shader_parameter/color3", blue3);
+        }
+    }
 
     internal AttackResult Attacks(PieceNode defender)
     {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Attack.Util;
 using Serilog;
+using Godot;
 
 namespace Attack.Saves.SQLLite
 {
@@ -79,6 +80,77 @@ namespace Attack.Saves.SQLLite
                     throw;
                 }
             }
+        }
+
+        public Queue<Vector2I[]> Load(GameInstance game)
+        {
+            var queue = new Queue<Vector2I[]>();
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        SELECT * FROM Turns
+                        WHERE Game = $Id
+                        ORDER BY Id
+                    ";
+
+                command.Parameters.AddWithValue("$Id", game.Id);
+
+                SqliteDataReader reader;
+
+                try
+                {
+                    reader = command.ExecuteReader();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Failed to read game turns for {game.Id}");
+                    throw;
+                }
+
+                while (reader.Read())
+                {
+                    var arr = new Vector2I[3];
+
+                    int id = (int)(long)reader.GetValue(0);
+
+                    Log.Debug($"Loading turn {id} of game {game.Id}");
+
+                    var startX = reader.GetValue(2);
+                    var startY = reader.GetValue(3);
+
+                    if (startX is not DBNull)
+                    {
+                        arr[0] = new Vector2I((int)(long)startX, (int)(long)startY);
+                    }
+
+                    // FIXME These may not exist
+                    var endX = reader.GetValue(4);
+                    var endY = reader.GetValue(5);
+
+                    if (endX is not DBNull)
+                    {
+                        arr[1] = new Vector2I((int)(long)endX, (int)(long)endY);
+                    }
+
+                    var attackX = reader.GetValue(6);
+                    var attackY = reader.GetValue(7);
+
+                    if (attackX is not DBNull)
+                    {
+                        arr[2] = new Vector2I((int)(long)attackX, (int)(long)attackY);
+                    }
+
+                    queue.Enqueue(arr);
+                }
+            }
+
+            return queue;
         }
     }
 }

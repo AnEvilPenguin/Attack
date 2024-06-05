@@ -27,7 +27,7 @@ public partial class BoardMap : TileMap
 
 	private GameMaster _gameMaster;
 
-	internal void createPiece(Vector2I location, PieceType type, Team team)
+	internal void CreatePiece(Vector2I location, PieceType type, Team team)
 	{
 		Tile tile;
 
@@ -45,6 +45,16 @@ public partial class BoardMap : TileMap
         tile.AddPiece(piece);
 
 		Log.Debug("Completed creating piece");
+    }
+
+	internal void AddPiece(PieceNode piece)
+	{
+		var location = (Vector2I)piece.Position;
+        lookup.TryGetValue(location, out Tile tile);
+
+		AddChild(piece);
+
+		tile.AddPiece(piece);
     }
 
 	internal List<Tile> ListPieces() =>
@@ -85,16 +95,19 @@ public partial class BoardMap : TileMap
 		}
 
 		Log.Debug("Completed readying board");
-
-        _gameMaster = GetNode<GameMaster>("/root/GameMaster");
-
-		_gameMaster.CreateGame(this);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	// TODO clean up this mess
 	public override void _Process(double delta)
 	{
+		if (_gameMaster == null)
+		{
+            _gameMaster = GetNode<GameMaster>("/root/GameMaster");
+
+            _gameMaster.CreateGame(this);
+        }
+
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
 		var turn = _gameMaster.CurrentTurn;
@@ -357,4 +370,35 @@ public partial class BoardMap : TileMap
             EraseCell((int)MapLayer.Overlay, tile.Position);
         }
 	}
+
+	public void ReplayTurn(Vector2I[] turn)
+	{
+		// Convert into a turn and play it out.
+		
+		var start = turn[0];
+		// There will always be a start
+
+		Tile tile = lookup[start];
+		ProcessGameLeftClick(tile); // probably a bodge
+	
+		var end = turn[1];
+
+		// Zero is always off map so never valid
+		if (end != Vector2I.Zero)
+		{
+            tile = lookup[end];
+			ProcessGameLeftClick(tile);
+        }
+
+		var attack = turn[2];
+
+        if (attack != Vector2I.Zero)
+        {
+            tile = lookup[attack];
+            ProcessGameLeftClick(tile);
+        }
+
+		// End the turn
+		_gameMaster.CompleteTurn(true);
+    }
 }
