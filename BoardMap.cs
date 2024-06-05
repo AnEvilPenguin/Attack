@@ -231,39 +231,6 @@ public partial class BoardMap : TileMap
         return tiles;
     }
 
-	private List<Tile> GetTileRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles)
-	{
-		bool canContinue = true;
-
-		do
-		{
-			if (--range == 0)
-				canContinue = false;
-
-			var neighbor = GetNeighborCell(tile.Position, direction);
-
-            if (lookup.TryGetValue(neighbor, out Tile neighbourTile))
-			{
-				if (neighbourTile.IsEmpty())
-				{
-					tiles.Add(neighbourTile);
-					tile = neighbourTile;
-                }
-				else
-				{
-					canContinue = false;
-				}
-			}
-			else
-			{
-				canContinue = false;
-			}
-
-		} while (canContinue);
-
-		return tiles;
-	}
-
     private void ProcessGameLeftClick(Tile tile)
     {
 		Log.Debug("Left click in game");
