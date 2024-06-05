@@ -135,5 +135,6 @@ public partial class PieceSelector : Control
     public void OnFinishTurnPressed()
     {
         Log.Debug("Finish Turn pressed");
+        _gameMaster.CompleteTurn();
     }
 }

@@ -50,6 +50,12 @@ namespace Attack.Game
             Log.Debug("Game Master Initialized");
         }
 
+        // Called every frame. 'delta' is the elapsed time since the previous frame.
+        public override void _Process(double delta)
+        {
+            // TODO if AI turn and not in progress kick off that logic
+        }
+
         public void New()
         {
             Log.Debug("Creating new game");
@@ -174,5 +180,18 @@ namespace Attack.Game
 
         public void RegisterNotification(Notification notification) =>
             _notification = notification;
+
+        public void CompleteTurn()
+        {
+            Log.Information("End of turn");
+
+            _board.ClearAllOverlayElements();
+
+            _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
+
+            CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
+
+            CanCompleteTurn = false;
+        }
     }
 }

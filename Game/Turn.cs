@@ -22,7 +22,7 @@ namespace Attack.Game
         Dictionary<Vector2I, Tile> ValidMoves = new Dictionary<Vector2I, Tile>();
         Dictionary<Vector2I, Tile> ValidAttacks = new Dictionary<Vector2I, Tile>();
 
-        Team TeamPlaying { get; set; }
+        public Team TeamPlaying { get; set; }
 
         internal Turn (Team currentTeam)
         {

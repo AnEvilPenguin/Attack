@@ -57,7 +57,6 @@ namespace Attack.Saves.SQLLite
 	                'EndY'	        INTEGER,
                     'AttackX'       INTEGER,
                     'AttackY'       INTEGER,
-	                'TurnNumber'	INTEGER,
 	                'DateTime'	    TEXT,
 	                FOREIGN KEY('Game') REFERENCES 'Games'('Id'),
 	                PRIMARY KEY('Id' AUTOINCREMENT)
@@ -65,6 +64,7 @@ namespace Attack.Saves.SQLLite
             ";
 
         private SaveGame _saveGame;
+        private SaveTurn _saveTurn;
 
         public SaveManager()
         {
@@ -72,6 +72,7 @@ namespace Attack.Saves.SQLLite
             _connectionString = $"Data Source={_databasePath}";
 
             _saveGame = new SaveGame();
+            _saveTurn = new SaveTurn();
         }
 
         public GameInstance NewGame() =>
@@ -85,6 +86,13 @@ namespace Attack.Saves.SQLLite
 
         public GameInstance LoadGame(int id) =>
             _saveGame.Load(id);
+
+        public void SaveGame(GameInstance game, Turn turn)
+        {
+            _saveTurn.Save(game, turn);
+            _saveGame.Save(game);
+        }
+            
 
         public void Initialize()
         {

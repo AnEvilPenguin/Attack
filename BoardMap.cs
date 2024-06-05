@@ -266,7 +266,7 @@ public partial class BoardMap : TileMap
 				turn.ClearMoves();
                 turn.ClearAttacks();
 
-				var selectedTile = turn.SelectedTile;
+                var selectedTile = turn.SelectedTile;
 				var moveTiles = GetTilesAtRange(selectedTile, selectedTile.Piece.Range, false);
 
 				foreach (var neighbourtile in moveTiles)
@@ -274,7 +274,7 @@ public partial class BoardMap : TileMap
                     SetCell((int)MapLayer.Highlight, neighbourtile.Position, 3, new Vector2I(0, 0), 0);
 					_gameMaster.CurrentTurn.AddMove(neighbourtile.Position, neighbourtile);
                 }
-				
+
                 processAttackMarkers(selectedTile, turn);
 
                 break;
@@ -293,7 +293,9 @@ public partial class BoardMap : TileMap
 
 			case TurnAction.Attack:
 				Log.Debug("End of turn");
-				// TODO this
+
+				// No take backsies
+				_gameMaster.CompleteTurn();
 				return;
 
 			case TurnAction.Invalid:
@@ -311,11 +313,11 @@ public partial class BoardMap : TileMap
             .Where(t => t.Piece?.Team == Team.Red);
 
         foreach (var neighbourtile in attackTiles)
-		{
+        {
             SetCell((int)MapLayer.Highlight, neighbourtile.Position, 4, new Vector2I(0, 0), 0);
             _gameMaster.CurrentTurn.AddAttack(neighbourtile.Position, neighbourtile);
-                }
-			}
+        }
+    }
 
 	private void ProcessSetupRightClick(Tile tile)
 	{
@@ -344,5 +346,15 @@ public partial class BoardMap : TileMap
 	private void ProcessGameRightClick()
 	{
 		_gameMaster.CurrentTurn.ProcessRightClick();
+        _gameMaster.CanCompleteTurn = false;
+    }
+
+	public void ClearAllOverlayElements()
+	{
+		foreach (var tile in tiles)
+		{
+            EraseCell((int)MapLayer.Highlight, tile.Position);
+            EraseCell((int)MapLayer.Overlay, tile.Position);
+        }
 	}
 }
