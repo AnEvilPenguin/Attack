@@ -36,7 +36,7 @@ namespace Attack.Game
                 if (tile.Piece == null)
                     return TurnAction.Invalid;
 
-                if (tile.Piece.Team != Team.Blue)
+                if (tile.Piece.Team != TeamPlaying)
                     return TurnAction.Invalid;
 
                 if (tile.Piece.Range < 1)
@@ -47,7 +47,7 @@ namespace Attack.Game
                 SelectedTile = tile;
                 return TurnAction.Select;
             } 
-            else if (SelectedTile != null && DestinationTile == null && tile.Piece?.Team == Team.Blue)
+            else if (SelectedTile != null && DestinationTile == null && tile.Piece?.Team == TeamPlaying)
             {
                 // We've still got a valid selection here
                 if (tile.Piece.Range < 1)

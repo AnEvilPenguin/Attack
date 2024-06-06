@@ -1,4 +1,5 @@
 using Attack.Game;
+using Attack.Util;
 using Godot;
 using Serilog;
 using System;
@@ -58,6 +59,11 @@ public partial class BoardMap : TileMap
 	internal List<Tile> ListPieces() =>
 		tiles
 			.Where(t => t.Piece != null)
+			.ToList();
+
+	internal List<Tile> ListEmptyTiles() =>
+		tiles
+			.Where(t => t.IsEmpty())
 			.ToList();
 		
 
@@ -275,8 +281,10 @@ public partial class BoardMap : TileMap
 			case TurnAction.Attack:
 				Log.Debug("End of turn");
 
-				// No take backsies
-				_gameMaster.CompleteTurn();
+				// No take backsies for the player
+				if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue)
+					_gameMaster.CompleteTurn();
+
 				return;
 
 			case TurnAction.Invalid:
@@ -291,7 +299,7 @@ public partial class BoardMap : TileMap
 			return;
 
         var attackTiles = GetTilesAtRange(tile, 1, true)
-            .Where(t => t.Piece?.Team == Team.Red);
+            .Where(t => t.Piece != null && t.Piece.Team != _gameMaster.CurrentTurn.TeamPlaying);
 
         foreach (var neighbourtile in attackTiles)
         {
@@ -302,7 +310,7 @@ public partial class BoardMap : TileMap
 
 	private void ProcessSetupRightClick(Tile tile)
 	{
-		if (tile.IsEmpty() && tile.Piece.Team != Team.Blue)
+		if (tile.IsEmpty() || tile.Piece.Team != Team.Blue)
 			return;
 
         var piece = tile.Piece;
@@ -342,23 +350,24 @@ public partial class BoardMap : TileMap
 	public void ReplayTurn(Vector2I[] turn)
 	{
 		// Convert into a turn and play it out.
-		
-		var start = turn[0];
-		// There will always be a start
-
-		Tile tile = lookup[start];
-		ProcessGameLeftClick(tile); // probably a bodge
-	
+		var select = turn[0];
 		var end = turn[1];
-
-		// Zero is always off map so never valid
-		if (end != Vector2I.Zero)
-		{
-            tile = lookup[end];
-			ProcessGameLeftClick(tile);
-        }
-
 		var attack = turn[2];
+		
+		PlayTurn(select, end, attack, true);
+    }
+
+	public void PlayTurn(Vector2I select, Vector2I end, Vector2I attack, bool replay = false)
+	{
+        // There will always be a select
+        Tile tile = lookup[select];
+        ProcessGameLeftClick(tile); // probably a bodge
+
+        if (end != Vector2I.Zero)
+        {
+            tile = lookup[end];
+            ProcessGameLeftClick(tile);
+        }
 
         if (attack != Vector2I.Zero)
         {
@@ -366,7 +375,6 @@ public partial class BoardMap : TileMap
             ProcessGameLeftClick(tile);
         }
 
-		// End the turn
-		_gameMaster.CompleteTurn(true);
+		_gameMaster.CompleteTurn(replay);
     }
 }
