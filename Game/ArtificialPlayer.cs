@@ -119,7 +119,7 @@ namespace Attack.Game
 
             _emptyTiles = ConvertTileListToDictionary(_board.ListEmptyTiles());
 
-            var friendlyTiles = tiles.Where(t => t.Piece.Team == Team.Red).ToList();
+            var friendlyTiles = tiles.Where(t => t.Piece.Team == Team.Red && t.Piece.Range > 0).ToList();
             _friendlyTiles = ConvertTileListToDictionary(friendlyTiles);
 
             var exposedFriendlyTiles = friendlyTiles.Where(t => t.Piece.Spotted).ToList();
