@@ -38,7 +38,6 @@ namespace Attack.Game
                 return;
 
 
-
             // TODO
 
             // If a piece with range is next to exposed enemy
@@ -56,7 +55,32 @@ namespace Attack.Game
 
             // Pick random low ranked piece to move
 
-            // Pick random hight ranked piece to move
+            // Pick random high ranked piece to move
+
+            // Oh dear
+            MoveRandomly();
+        }
+
+        private void MoveRandomly()
+        {
+            // if we're here something has probably gone badly wrong.
+            Log.Warning("Moving a random tile randomly");
+
+            foreach (var tile in _friendlyTiles.Values)
+            {
+                var destination = tile.GetNeighbours()
+                    .FirstOrDefault(n => _emptyTiles.ContainsKey(n));
+
+                if (destination == Vector2I.Zero)
+                    continue;
+
+                // doesn't matter if this is Zero or not
+                var attack = _emptyTiles[destination].GetNeighbours()
+                    .FirstOrDefault(n => _enemyTiles.ContainsKey(n));
+
+                _board.PlayTurn(tile.Position, destination, attack);
+                return;
+            }
         }
 
         private bool DirectAttackExposed()
