@@ -185,7 +185,7 @@ public partial class BoardMap : TileMap
         Log.Debug("Completed placement of tile");
     }
 
-	private List<Tile> GetTilesAtRange(Tile tile, int range, bool includePieces)
+	internal List<Tile> GetTilesAtRange(Tile tile, int range, bool includePieces)
 	{
         var tiles = new List<Tile>();
 
@@ -197,7 +197,7 @@ public partial class BoardMap : TileMap
 		return tiles;
     }
 
-	private List<Tile> GetTilesAtRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles, bool includePieces)
+	internal List<Tile> GetTilesAtRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles, bool includePieces)
 	{
         bool canContinue = true;
 

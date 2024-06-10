@@ -40,18 +40,17 @@ namespace Attack.Game
             if (MoveThenAttackExposed())
                 return;
 
-            // TODO
+            if (MoveScout())
+                return;
 
-            // If a piece with range is next to exposed enemy
-            // and piece can capture enemy piece
-            // capture/attack that piece
+            if (MoveThenAttackUnexposed())
+                return;
+
+            // TODO
 
             // If a piece with range is next to unexposed enemy
             // attack that piece
             // TODO consider if we want this to always happen, or priority (attack with lower ranks first?)
-
-            // If a scout can move more than 1 tile down the Y axis do that
-            // attack if possible
 
             // If Engineer within (4?) tiles of exposed Landmine move towards that
 
@@ -61,6 +60,69 @@ namespace Attack.Game
 
             // Oh dear
             MoveRandomly();
+        }
+
+        private bool MoveScout()
+        {
+            var scouts = _friendlyTiles
+                .Values
+                .Where(t => t.Piece.PieceType == PieceType.Scout)
+                .ToList();
+
+            int distance = 0;
+            Tile selected = null;
+            Tile destination = null;
+            Tile attack = null;
+
+            void rollup (List<Tile> tiles, Tile scout, TileSet.CellNeighbor dir)
+            {
+                if (tiles.Count <= distance)
+                    return;
+
+                var lastTile = tiles.Last();
+
+                var enemy = lastTile.GetNeighbours()
+                    .Where(n => !_exposedEnemyTiles.ContainsKey(n) && _enemyTiles.ContainsKey(n))
+                    .FirstOrDefault();
+
+                if (enemy == Vector2.Zero)
+                    return;
+
+                distance = tiles.Count;
+                selected = scout;
+                destination = lastTile;
+                attack = _enemyTiles[enemy];
+            };
+
+
+            foreach (var scout in scouts)
+            {
+                var south = _board.GetTilesAtRange(scout, scout.Piece.Range, TileSet.CellNeighbor.BottomSide, new List<Tile>(), false);
+                rollup(south, scout, TileSet.CellNeighbor.BottomSide);
+
+                var east = _board.GetTilesAtRange(scout, scout.Piece.Range, TileSet.CellNeighbor.RightSide, new List<Tile>(), false);
+                rollup(south, scout, TileSet.CellNeighbor.BottomSide);
+
+                var west = _board.GetTilesAtRange(scout, scout.Piece.Range, TileSet.CellNeighbor.LeftSide, new List<Tile>(), false);
+                rollup(south, scout, TileSet.CellNeighbor.BottomSide);
+
+                var north = _board.GetTilesAtRange(scout, scout.Piece.Range, TileSet.CellNeighbor.TopSide, new List<Tile>(), false);
+                rollup(south, scout, TileSet.CellNeighbor.BottomSide);
+            }
+
+            if (selected != null)
+            {
+                _board.PlayTurn(selected.Position, destination.Position, attack.Position);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool MoveThenAttackUnexposed()
+        {
+            // TODO this
+            return false;
         }
 
         private bool MoveThenAttackExposed()
@@ -131,6 +193,7 @@ namespace Attack.Game
 
             return false;
         }
+
         private void MoveRandomly()
         {
             // if we're here something has probably gone badly wrong.
@@ -200,7 +263,7 @@ namespace Attack.Game
             var selectedTile = friendlyNextToEnemy[0];
 
             var target = selectedTile.GetNeighbours()
-                .Find(n => _enemyTiles.ContainsKey(n));
+                .Find(n => !_exposedEnemyTiles.ContainsKey(n) && _enemyTiles.ContainsKey(n));
 
             _board.PlayTurn(selectedTile.Position, Vector2I.Zero, target);
             return true;
