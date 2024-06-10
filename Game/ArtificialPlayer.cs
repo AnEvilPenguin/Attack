@@ -37,6 +37,8 @@ namespace Attack.Game
             if (DirectAttackHidden())
                 return;
 
+            if (MoveThenAttackExposed())
+                return;
 
             // TODO
 
@@ -61,6 +63,74 @@ namespace Attack.Game
             MoveRandomly();
         }
 
+        private bool MoveThenAttackExposed()
+        {
+            // Find highest difference in value
+            var attackableValues = new List<Tuple<Tile, Tile>>();
+
+            foreach (var tile in _exposedFriendlyTiles.Values)
+            {
+                var attackableExposed = tile.GetLocationsWithinRange(true)
+                        .Where(l => _exposedEnemyTiles.ContainsKey(l));
+
+                foreach (var attackableTile in attackableExposed)
+                {
+                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                }
+            }
+
+            if (attackableValues.Count > 0)
+            {
+                if(FindPieceToAttack(attackableValues))
+                    return true;
+            }
+
+            foreach (var tile in _friendlyTiles.Values)
+            {
+                var attackableExposed = tile.GetLocationsWithinRange(true)
+                        .Where(l => _exposedEnemyTiles.ContainsKey(l));
+
+                foreach (var attackableTile in attackableExposed)
+                {
+                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                }
+            }
+
+            return FindPieceToAttack(attackableValues);
+        }
+
+        private bool FindPieceToAttack(List<Tuple<Tile, Tile>> attackableValues)
+        {
+            if (attackableValues.Count < 0)
+                return false;
+
+            Tuple<Tile, Tile> attack = new Tuple<Tile, Tile>(null, null);
+            int minPositive = 0;
+
+            foreach (var tuple in attackableValues)
+            {
+                var value = (int)tuple.Item1.Piece.PieceType - (int)tuple.Item2.Piece.PieceType;
+                if ((minPositive == 0 || value < minPositive) && value > 0)
+                {
+                    minPositive = value;
+                    attack = tuple;
+                }
+            }
+
+            if (minPositive > 0)
+            {
+                var neighbours = attack.Item2.GetNeighbours();
+                var destination = attack.Item1
+                    .GetNeighbours()
+                    .First(n => neighbours.Contains(n));
+
+                _board.PlayTurn(attack.Item1.Position, destination, attack.Item2.Position);
+
+                return true;
+            }
+
+            return false;
+        }
         private void MoveRandomly()
         {
             // if we're here something has probably gone badly wrong.
