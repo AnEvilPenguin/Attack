@@ -14,6 +14,8 @@ namespace Attack.Game
         private BoardMap _board;
         private GameMaster _master;
 
+        private Random _random = new Random();
+
         private Dictionary<Vector2I, Tile> _friendlyTiles;
         private Dictionary<Vector2I, Tile> _exposedFriendlyTiles;
         private Dictionary<Vector2I, Tile> _enemyTiles;
@@ -199,7 +201,12 @@ namespace Attack.Game
             // if we're here something has probably gone badly wrong.
             Log.Warning("Moving a random tile randomly");
 
-            foreach (var tile in _friendlyTiles.Values)
+            // Note that this is fine for small numbers, but there are much better alogrithms
+            //     (that are more difficult to implement).
+            // e.g. Fisher-Yates / Knuth
+            var randomisedList = _friendlyTiles.Values.OrderBy(_ => _random.Next()).ToList();
+
+            foreach (var tile in randomisedList)
             {
                 var destination = tile.GetNeighbours()
                     .FirstOrDefault(n => _emptyTiles.ContainsKey(n));
