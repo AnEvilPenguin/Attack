@@ -62,26 +62,8 @@ namespace Attack.Game
 
         public bool IsEmpty() => Piece == null & Type == TileType.Terrain;
 
-        public List<Vector2I> GetNeighbours()
-        {
-            var list = new List<Vector2I>();
-
-            Vector2I north = Position - new Vector2I(0, 1);
-            Vector2I east = Position - new Vector2I(1, 0);
-            Vector2I south = Position + new Vector2I(0, 1);
-            Vector2I west = Position + new Vector2I(1, 0);
-
-            if(IsValidLocation(north))
-                list.Add(north);
-            if(IsValidLocation(east))
-                list.Add(east);
-            if (IsValidLocation(south))
-                list.Add(south);
-            if (IsValidLocation(west))
-                list.Add(west);
-
-            return list;
-        }
+        public List<Vector2I> GetNeighbours() =>
+            GetNeighbouringLocations(Position);
 
         public List<Vector2I> GetOtherRowAndColumnLocations()
         {
@@ -97,6 +79,64 @@ namespace Attack.Game
                 if (y != Position)
                     list.Add(y);
             }
+
+            return list;
+        }
+
+        public List<Vector2I> GetLocationsWithinRange(bool includeAttack)
+        {
+            var list = new List<Vector2I>();
+
+            if (Piece == null || Piece.Range < 1)
+                return list;
+
+            for (int i = 1; i <= Piece.Range; i++)
+            {
+                Vector2I north = Position - new Vector2I(0, i);
+                Vector2I east = Position - new Vector2I(i, 0);
+                Vector2I south = Position + new Vector2I(0, i);
+                Vector2I west = Position + new Vector2I(i, 0);
+
+                if (IsValidLocation(north))
+                    list.Add(north);
+                if (IsValidLocation(east))
+                    list.Add(east);
+                if (IsValidLocation(south))
+                    list.Add(south);
+                if (IsValidLocation(west))
+                    list.Add(west);
+            }
+
+            if (includeAttack)
+            {
+                var listCopy = new List<Vector2I>(list);
+
+                foreach (var location in listCopy)
+                {
+                    list.AddRange(GetNeighbouringLocations(location));
+                }
+            }
+
+            return list.Distinct().ToList();
+        }
+
+        private List<Vector2I> GetNeighbouringLocations(Vector2I position)
+        {
+            var list = new List<Vector2I>();
+
+            Vector2I north = position - new Vector2I(0, 1);
+            Vector2I east = position - new Vector2I(1, 0);
+            Vector2I south = position + new Vector2I(0, 1);
+            Vector2I west = position + new Vector2I(1, 0);
+
+            if (IsValidLocation(north))
+                list.Add(north);
+            if (IsValidLocation(east))
+                list.Add(east);
+            if (IsValidLocation(south))
+                list.Add(south);
+            if (IsValidLocation(west))
+                list.Add(west);
 
             return list;
         }
