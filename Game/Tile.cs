@@ -141,6 +141,12 @@ namespace Attack.Game
             return list;
         }
 
+        public Vector2I DistanceFromPosition(Vector2I position) =>
+            position - Position;
+
+        public Vector2I DistanceFromTile(Tile tile) =>
+            DistanceFromPosition(tile.Position);
+
         private bool IsValidLocation(Vector2I location) =>
             location.X > 0 &&
             location.Y > 0 &&

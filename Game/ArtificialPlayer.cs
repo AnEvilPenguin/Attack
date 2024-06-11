@@ -121,8 +121,40 @@ namespace Attack.Game
             return false;
         }
 
+        private List<Tuple<Tile, Tile>> getNeighboursAndTargets(Tile source, IEnumerable<Tile> validTargets)
+        {
+            var validNeigbours = source.GetNeighbours()
+                .Where(n => _emptyTiles.ContainsKey(n));
+
+            return validTargets
+                .SelectMany(t => t.GetNeighbours(), (t, n) => new Tuple<Tile, Vector2I>(t, n))
+                .Where(t => validNeigbours.Contains(t.Item2))
+                .Select(t => new Tuple<Tile, Tile>(t.Item1, _emptyTiles[t.Item2]))
+                .ToList();
+        }
+
         private bool MoveThenAttackUnexposed()
         {
+            var friendlyByRank = _friendlyTiles.Values
+                .OrderBy(f => (int)f.Piece.PieceType)
+                .ToList();
+
+            foreach (var tile in friendlyByRank)
+            {
+                var targets = getNeighboursAndTargets(tile, _enemyTiles.Values);
+
+                if (targets.Count > 0)
+                {
+                    var first = targets.First();
+
+                    var destination = first.Item2;
+                    var attack = first.Item1;
+
+                    _board.PlayTurn(tile.Position, destination.Position, attack.Position);
+                    return true;
+                }
+            }
+
             // TODO this
             return false;
         }
