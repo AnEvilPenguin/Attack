@@ -2,6 +2,7 @@
 using Godot;
 using Serilog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,13 +49,12 @@ namespace Attack.Game
             if (MoveThenAttackUnexposed())
                 return;
 
+            if (MoveEngineer())
+                return;
+
             // TODO
 
-            // If a piece with range is next to unexposed enemy
-            // attack that piece
-            // TODO consider if we want this to always happen, or priority (attack with lower ranks first?)
-
-            // If Engineer within (4?) tiles of exposed Landmine move towards that
+            // Move Spy towards CIC
 
             // Pick random low ranked piece to move
 
@@ -62,6 +62,56 @@ namespace Attack.Game
 
             // Oh dear
             MoveRandomly();
+        }
+
+        private bool MoveEngineer()
+        {
+            if (!_exposedEnemyTiles.Values.Any(t => t.Piece.PieceType == PieceType.Landmine))
+                return false;
+
+            if (!_friendlyTiles.Values.Any(t => t.Piece.PieceType == PieceType.Engineer)) 
+                return false;
+
+            var north = new Vector2I(0, -1);
+            var south = new Vector2I(0, 1);
+            var east = new Vector2I(1, 0);
+            var west = new Vector2I(-1, 0);
+
+            var engineers = _friendlyTiles.Values.Where(t => t.Piece.PieceType == PieceType.Engineer);
+            var landmines = _exposedEnemyTiles.Values.Where(t => t.Piece.PieceType == PieceType.Landmine);
+
+            foreach (var engineer in engineers)
+            {
+                foreach (var mine in landmines)
+                {
+                    var distance = engineer.DistanceFromTile(mine);
+
+                    var absolute = distance.Abs();
+
+                    if (absolute.X + absolute.Y > 4)
+                        continue;
+
+                    Tile destination;
+
+                    // Prefer moving east or west
+                    // (going directly north/south poses higher risk of being attacked)
+                    if (distance.X > 0 && _emptyTiles.ContainsKey(engineer.Position + east))
+                        destination = _emptyTiles[engineer.Position + east];
+                    else if (distance.X < 0 && _emptyTiles.ContainsKey(engineer.Position + west))
+                        destination = _emptyTiles[engineer.Position + west];
+                    else if (distance.Y < 0 && _emptyTiles.ContainsKey(engineer.Position + north))
+                        destination = _emptyTiles[engineer.Position + north];
+                    else if (distance.Y > 0 && _emptyTiles.ContainsKey(engineer.Position + south))
+                        destination = _emptyTiles[engineer.Position + south];
+                    else
+                        continue;
+
+                    _board.PlayTurn(engineer.Position, destination.Position, Vector2I.Zero);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool MoveScout()
