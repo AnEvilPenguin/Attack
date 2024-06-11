@@ -2,13 +2,13 @@
 
 Takes inspiration from L'Attaque and another similar but unnamed strategy board game.
 
-The game is played on a tiled board, where there are a set number of hidden peices (of varying rank and capability). The player will be expected to 'scout' out the pieces placed by the opposition and will need to react to chaging information. The game is won when a player captures the flag of the opposing player.
+The game is played on a tiled board, where there are a set number of hidden peices (of varying rank and capability). The player will be expected to 'scout' out the pieces placed by the opposition and will need to react to changing information. The game is won when a player captures the flag of the opposing player.
 
 ## Player Experience
 
 The player will be able to play against the computer. This will be a 2d no-frills game.
 The player must learn what pieces the computer has played and then maneuver their own in order to best it.
-To an extent there is a stone, parchment, shears element and feel to the game.
+To an extent there is a quartz, parchment, shears element and feel to the game.
 
 ## Platform
 The game is developed to be released on Windows PC.

@@ -1,4 +1,5 @@
 using Attack.Game;
+using Attack.Util;
 using Godot;
 using Serilog;
 using System;
@@ -17,8 +18,6 @@ public partial class BoardMap : TileMap
 
 	[Export]
 	public PackedScene PieceScene { get; set; }
-
-	int GridSize = 12;
 
 	List<Tile> tiles = new List<Tile>();
 	Dictionary<Vector2I, Tile> lookup = new Dictionary<Vector2I, Tile>();
@@ -61,6 +60,11 @@ public partial class BoardMap : TileMap
 		tiles
 			.Where(t => t.Piece != null)
 			.ToList();
+
+	internal List<Tile> ListEmptyTiles() =>
+		tiles
+			.Where(t => t.IsEmpty())
+			.ToList();
 		
 
 	// Called when the node enters the scene tree for the first time.
@@ -69,18 +73,19 @@ public partial class BoardMap : TileMap
 		Log.Debug("Readying board");
 
 		_offset = GlobalPosition;
+		int gridSize = Constants.GridSize;
 
-		for (int i = 0; i < GridSize; i++)
+		for (int i = 0; i < gridSize; i++)
 		{
-			for (int j = 0; j < GridSize; j++)
+			for (int j = 0; j < gridSize; j++)
 			{
 				// TODO Extract
 				TileType tileId = TileType.Terrain;
 
-				if (i == 0 || j == 0 || i == GridSize - 1 || j == GridSize - 1)
+				if (i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1)
 					tileId = TileType.Border;
 
-				bool startingTile = tileId == TileType.Terrain && j > GridSize - 6;
+				bool startingTile = tileId == TileType.Terrain && j > gridSize - 6;
 
 				var location = new Vector2I(i, j);
 
@@ -118,12 +123,14 @@ public partial class BoardMap : TileMap
         if (_gameMaster.NotificationShowing)
 			return;
 
+		// TODO if AI turn kick that process off and ignore player input
+
 		var mousePosition = GetLocalMousePosition();
         var mapLocation = LocalToMap(mousePosition);
 
         if (!lookup.TryGetValue(mapLocation, out Tile tile))
         {
-            Log.Debug("Click outside map");
+            //Log.Debug("Click outside map");
             return;
         }
 
@@ -178,7 +185,7 @@ public partial class BoardMap : TileMap
         Log.Debug("Completed placement of tile");
     }
 
-	private List<Tile> GetTilesAtRange(Tile tile, int range, bool includePieces)
+	internal List<Tile> GetTilesAtRange(Tile tile, int range, bool includePieces)
 	{
         var tiles = new List<Tile>();
 
@@ -190,7 +197,7 @@ public partial class BoardMap : TileMap
 		return tiles;
     }
 
-	private List<Tile> GetTilesAtRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles, bool includePieces)
+	internal List<Tile> GetTilesAtRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles, bool includePieces)
 	{
         bool canContinue = true;
 
@@ -228,39 +235,6 @@ public partial class BoardMap : TileMap
 
         return tiles;
     }
-
-	private List<Tile> GetTileRange(Tile tile, int range, TileSet.CellNeighbor direction, List<Tile> tiles)
-	{
-		bool canContinue = true;
-
-		do
-		{
-			if (--range == 0)
-				canContinue = false;
-
-			var neighbor = GetNeighborCell(tile.Position, direction);
-
-            if (lookup.TryGetValue(neighbor, out Tile neighbourTile))
-			{
-				if (neighbourTile.IsEmpty())
-				{
-					tiles.Add(neighbourTile);
-					tile = neighbourTile;
-                }
-				else
-				{
-					canContinue = false;
-				}
-			}
-			else
-			{
-				canContinue = false;
-			}
-
-		} while (canContinue);
-
-		return tiles;
-	}
 
     private void ProcessGameLeftClick(Tile tile)
     {
@@ -307,8 +281,10 @@ public partial class BoardMap : TileMap
 			case TurnAction.Attack:
 				Log.Debug("End of turn");
 
-				// No take backsies
-				_gameMaster.CompleteTurn();
+				// No take backsies for the player
+				if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue)
+					_gameMaster.CompleteTurn();
+
 				return;
 
 			case TurnAction.Invalid:
@@ -323,7 +299,7 @@ public partial class BoardMap : TileMap
 			return;
 
         var attackTiles = GetTilesAtRange(tile, 1, true)
-            .Where(t => t.Piece?.Team == Team.Red);
+            .Where(t => t.Piece != null && t.Piece.Team != _gameMaster.CurrentTurn.TeamPlaying);
 
         foreach (var neighbourtile in attackTiles)
         {
@@ -334,7 +310,8 @@ public partial class BoardMap : TileMap
 
 	private void ProcessSetupRightClick(Tile tile)
 	{
-		if (tile.IsEmpty() && tile.Piece?.Team != Team.Blue)
+
+		if (tile.IsEmpty() || tile.Piece?.Team != Team.Blue)
 			return;
 
         var piece = tile.Piece;
@@ -374,23 +351,26 @@ public partial class BoardMap : TileMap
 	public void ReplayTurn(Vector2I[] turn)
 	{
 		// Convert into a turn and play it out.
-		
-		var start = turn[0];
-		// There will always be a start
-
-		Tile tile = lookup[start];
-		ProcessGameLeftClick(tile); // probably a bodge
-	
+		var select = turn[0];
 		var end = turn[1];
-
-		// Zero is always off map so never valid
-		if (end != Vector2I.Zero)
-		{
-            tile = lookup[end];
-			ProcessGameLeftClick(tile);
-        }
-
 		var attack = turn[2];
+		
+		PlayTurn(select, end, attack, true);
+    }
+
+	public void PlayTurn(Vector2I select, Vector2I end, Vector2I attack, bool replay = false)
+	{
+		Log.Debug($"Playing out {select} - {end} - {attack}");
+
+        // There will always be a select
+        Tile tile = lookup[select];
+        ProcessGameLeftClick(tile); // probably a bodge
+
+        if (end != Vector2I.Zero)
+        {
+            tile = lookup[end];
+            ProcessGameLeftClick(tile);
+        }
 
         if (attack != Vector2I.Zero)
         {
@@ -398,7 +378,6 @@ public partial class BoardMap : TileMap
             ProcessGameLeftClick(tile);
         }
 
-		// End the turn
-		_gameMaster.CompleteTurn(true);
+		_gameMaster.CompleteTurn(replay);
     }
 }

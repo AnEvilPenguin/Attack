@@ -23,6 +23,7 @@ namespace Attack.Game
         public bool CanCompleteTurn = false;
         public bool NotificationShowing = false;
         public bool LoadGame = false;
+        public bool AiTurn = false;
 
         private List<PieceNode> _initialPlacements;
         private Queue<Vector2I[]> _protoTurns;
@@ -37,6 +38,8 @@ namespace Attack.Game
         private Dictionary<PieceType, int> _playerPieceCount;
 
         public PieceType SelectedPieceType;
+
+        private ArtificialPlayer _aiPlayer;
 
         public override void _Ready()
         {
@@ -57,7 +60,31 @@ namespace Attack.Game
         // Called every frame. 'delta' is the elapsed time since the previous frame.
         public override void _Process(double delta)
         {
-            // TODO if AI turn and not in progress kick off that logic
+            if (!GameStarted) 
+                return;
+
+            if (CurrentTurn == null)
+                return;
+
+            if (CurrentTurn.TeamPlaying == Team.Red && AiTurn == false)
+            {
+                if (_aiPlayer == null)
+                    _aiPlayer = new ArtificialPlayer(_board, this);
+
+                AiTurn = true;
+
+                try
+                {
+                    _aiPlayer.ProcessTurn();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to process AI player turn");
+                }
+                
+
+                AiTurn = false;
+            }
         }
 
         public bool CanLoadGames()
@@ -142,6 +169,7 @@ namespace Attack.Game
                     _board.ReplayTurn(_protoTurns.Dequeue());
                 }
 
+                GameStarted = true;
                 return;
             }
 
@@ -180,10 +208,6 @@ namespace Attack.Game
 
                 piece.QueueFree();
             }
-
-            GameStarted = true;
-
-            // TODO replay turns
         }
 
         private void GeneratePlayerPieceCount() =>

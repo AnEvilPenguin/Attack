@@ -1,4 +1,5 @@
 using Godot;
+using Serilog;
 using System;
 
 internal enum PieceType // Interface Terrain?
@@ -159,6 +160,8 @@ public partial class PieceNode : Node2D
         Spotted = true;
         defender.Spotted = true;
 
+        Log.Debug($"{PieceType} attacks {defender.PieceType}");
+
         switch (defender.PieceType)
         {
             case PieceType.Landmine:
@@ -170,6 +173,11 @@ public partial class PieceNode : Node2D
                 return PieceType == PieceType.Spy ?
                     AttackResult.Victory :
                     AttackResult.Defeat;
+
+            case PieceType.Spy:
+                return PieceType == PieceType.CommanderInChief ?
+                    AttackResult.Defeat :
+                    AttackResult.Victory;
 
             case PieceType.Flag:
                 return AttackResult.Victory;

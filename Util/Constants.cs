@@ -33,5 +33,7 @@ namespace Attack.Util
                 { PieceType.CommanderInChief, 1 },
                 { PieceType.Flag, 1 },
             };
+
+        public const int GridSize = 12;
     }
 }

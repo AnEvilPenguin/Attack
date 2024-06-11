@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using Attack.Util;
+using Godot;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Attack.Game
 
         public void AddPiece(PieceNode piece)
         {
-            Log.Debug($"Adding Piece {piece.PieceType} to {LocalPosition} for {piece.Team}");
+            Log.Debug($"Adding Piece {piece.PieceType} to {Position} for {piece.Team}");
 
             piece.Position = LocalPosition;
             Type = TileType.Piece;
@@ -53,12 +54,104 @@ namespace Attack.Game
             if (Piece == null)
                 return;
 
-            Log.Debug($"Removing Piece {Piece.PieceType} for {Piece.Team} from {LocalPosition}");
+            Log.Debug($"Removing Piece {Piece.PieceType} from {Position} for {Piece.Team}");
 
             Piece = null;
             Type = TileType.Terrain;
         }
 
         public bool IsEmpty() => Piece == null & Type == TileType.Terrain;
+
+        public List<Vector2I> GetNeighbours() =>
+            GetNeighbouringLocations(Position);
+
+        public List<Vector2I> GetOtherRowAndColumnLocations()
+        {
+            var list = new List<Vector2I>();
+
+            for (int i = 1; i < Constants.GridSize -1; i++)
+            {
+                var x = new Vector2I(i, Position.Y);
+                var y = new Vector2I(Position.X, i);
+
+                if (x != Position)
+                    list.Add(x);
+                if (y != Position)
+                    list.Add(y);
+            }
+
+            return list;
+        }
+
+        public List<Vector2I> GetLocationsWithinRange(bool includeAttack)
+        {
+            var list = new List<Vector2I>();
+
+            if (Piece == null || Piece.Range < 1)
+                return list;
+
+            for (int i = 1; i <= Piece.Range; i++)
+            {
+                Vector2I north = Position - new Vector2I(0, i);
+                Vector2I east = Position - new Vector2I(i, 0);
+                Vector2I south = Position + new Vector2I(0, i);
+                Vector2I west = Position + new Vector2I(i, 0);
+
+                if (IsValidLocation(north))
+                    list.Add(north);
+                if (IsValidLocation(east))
+                    list.Add(east);
+                if (IsValidLocation(south))
+                    list.Add(south);
+                if (IsValidLocation(west))
+                    list.Add(west);
+            }
+
+            if (includeAttack)
+            {
+                var listCopy = new List<Vector2I>(list);
+
+                foreach (var location in listCopy)
+                {
+                    list.AddRange(GetNeighbouringLocations(location));
+                }
+            }
+
+            return list.Distinct().ToList();
+        }
+
+        private List<Vector2I> GetNeighbouringLocations(Vector2I position)
+        {
+            var list = new List<Vector2I>();
+
+            Vector2I north = position - new Vector2I(0, 1);
+            Vector2I east = position - new Vector2I(1, 0);
+            Vector2I south = position + new Vector2I(0, 1);
+            Vector2I west = position + new Vector2I(1, 0);
+
+            if (IsValidLocation(north))
+                list.Add(north);
+            if (IsValidLocation(east))
+                list.Add(east);
+            if (IsValidLocation(south))
+                list.Add(south);
+            if (IsValidLocation(west))
+                list.Add(west);
+
+            return list;
+        }
+
+        public Vector2I DistanceFromPosition(Vector2I position) =>
+            position - Position;
+
+        public Vector2I DistanceFromTile(Tile tile) =>
+            DistanceFromPosition(tile.Position);
+
+        private bool IsValidLocation(Vector2I location) =>
+            location.X > 0 &&
+            location.Y > 0 &&
+            location.X < Constants.GridSize - 1 &&
+            location.Y < Constants.GridSize - 1;
+
     }
 }
