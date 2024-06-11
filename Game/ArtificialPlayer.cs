@@ -66,10 +66,10 @@ namespace Attack.Game
 
         private bool MoveEngineer()
         {
-            if (!_exposedEnemyTiles.Values.Any(t => t.Piece.PieceType == PieceType.Landmine))
+            if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.Landmine))
                 return false;
 
-            if (!_friendlyTiles.Values.Any(t => t.Piece.PieceType == PieceType.Engineer)) 
+            if (!HasPieceType(_friendlyTiles.Values, PieceType.Engineer)) 
                 return false;
 
             var north = new Vector2I(0, -1);
@@ -418,5 +418,8 @@ namespace Attack.Game
 
             return dict;
         }
+
+        private bool HasPieceType(IEnumerable<Tile> tiles, PieceType type) =>
+            tiles.Any(t => t.Piece != null && t.Piece.PieceType == type);
     }
 }
