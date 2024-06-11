@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Godot.Time;
 
 namespace Attack.Game
 {
@@ -52,9 +53,10 @@ namespace Attack.Game
             if (MoveEngineer())
                 return;
 
-            // TODO
+            if (MoveSpy())
+                return;
 
-            // Move Spy towards CIC
+            // TODO
 
             // Pick random low ranked piece to move
 
@@ -62,6 +64,53 @@ namespace Attack.Game
 
             // Oh dear
             MoveRandomly();
+        }
+
+        private bool MoveSpy()
+        {
+            if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.CommanderInChief))
+                return false;
+
+            if (!HasPieceType(_friendlyTiles.Values, PieceType.Spy))
+                return false;
+
+            var spy = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Spy);
+            var cic = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.CommanderInChief);
+
+            var distance = spy.DistanceFromTile(cic);
+
+            Tile destination = DirectionToDestination(spy, cic);
+
+            if (destination == null)
+                return false;
+
+            _board.PlayTurn(spy.Position, destination.Position, Vector2I.Zero);
+            return true;
+
+            return true;
+        }
+
+        private Tile DirectionToDestination(Tile source, Tile target)
+        {
+            var north = new Vector2I(0, -1);
+            var south = new Vector2I(0, 1);
+            var east = new Vector2I(1, 0);
+            var west = new Vector2I(-1, 0);
+
+            var distance = source.DistanceFromTile(target);
+
+            Tile destination = null;
+
+            if (distance.X > 0 && _emptyTiles.ContainsKey(source.Position + east))
+                destination = _emptyTiles[source.Position + east];
+            else if (distance.X < 0 && _emptyTiles.ContainsKey(source.Position + west))
+                destination = _emptyTiles[source.Position + west];
+            else if (distance.Y < 0 && _emptyTiles.ContainsKey(source.Position + north))
+                destination = _emptyTiles[source.Position + north];
+            else if (distance.Y > 0 && _emptyTiles.ContainsKey(source.Position + south))
+                destination = _emptyTiles[source.Position + south];
+
+            return destination;
         }
 
         private bool MoveEngineer()
@@ -91,19 +140,9 @@ namespace Attack.Game
                     if (absolute.X + absolute.Y > 4)
                         continue;
 
-                    Tile destination;
+                    Tile destination = DirectionToDestination(engineer, mine);
 
-                    // Prefer moving east or west
-                    // (going directly north/south poses higher risk of being attacked)
-                    if (distance.X > 0 && _emptyTiles.ContainsKey(engineer.Position + east))
-                        destination = _emptyTiles[engineer.Position + east];
-                    else if (distance.X < 0 && _emptyTiles.ContainsKey(engineer.Position + west))
-                        destination = _emptyTiles[engineer.Position + west];
-                    else if (distance.Y < 0 && _emptyTiles.ContainsKey(engineer.Position + north))
-                        destination = _emptyTiles[engineer.Position + north];
-                    else if (distance.Y > 0 && _emptyTiles.ContainsKey(engineer.Position + south))
-                        destination = _emptyTiles[engineer.Position + south];
-                    else
+                    if (destination == null)
                         continue;
 
                     _board.PlayTurn(engineer.Position, destination.Position, Vector2I.Zero);
