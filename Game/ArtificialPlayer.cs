@@ -56,14 +56,71 @@ namespace Attack.Game
             if (MoveSpy())
                 return;
 
-            // TODO
+            if (MoveLowRank())
+                return;
 
-            // Pick random low ranked piece to move
-
-            // Pick random high ranked piece to move
+            if (MoveHighRank())
+                return;
 
             // Oh dear
             MoveRandomly();
+        }
+
+        private bool MoveHighRank() =>
+            MoveByRank(t => (int)t.Piece.PieceType > 5);
+
+        private bool MoveLowRank() =>
+            MoveByRank(t => (int)t.Piece.PieceType <= 5);
+
+        private bool MoveByRank(Func<Tile, bool> filter)
+        {
+            var tiles = _friendlyTiles.Values
+                .Where(filter)
+                .Where(t => t.GetNeighbours()
+                    .Any(n => _emptyTiles.ContainsKey(n)))
+                .OrderBy(t => (int)t.Piece.PieceType);
+
+            foreach (var tile in tiles)
+            {
+                int shortestDistance = -1;
+                var closestEnemies = _enemyTiles.Values
+                    .OrderBy(t =>
+                    {
+                        var abs = tile.DistanceFromTile(t).Abs();
+
+                        int dist = abs.X + abs.Y;
+
+                        if (shortestDistance == -1 || dist < shortestDistance)
+                            shortestDistance = dist;
+
+                        return dist;
+                    })
+                    .Where(t =>
+                    {
+                        var abs = tile.DistanceFromTile(t).Abs();
+                        return abs.X + abs.Y == shortestDistance;
+                    });
+
+                // find empty tiles where distance is closer than shortest distance
+                var closest = tile.GetNeighbours()
+                    .Where(n => _emptyTiles.ContainsKey(n))
+                    .Where(n => closestEnemies.Any(e =>
+                    {
+                        var abs = e.DistanceFromPosition(n).Abs();
+                        return abs.X + abs.Y < shortestDistance;
+                    }))
+                    .FirstOrDefault();
+
+                if (closest == Vector2I.Zero)
+                    continue;
+
+                var destination = _emptyTiles[closest];
+
+                _board.PlayTurn(tile.Position, destination.Position, Vector2I.Zero);
+                return true;
+            }
+
+            return false;
         }
 
         private bool MoveSpy()
@@ -85,8 +142,6 @@ namespace Attack.Game
                 return false;
 
             _board.PlayTurn(spy.Position, destination.Position, Vector2I.Zero);
-            return true;
-
             return true;
         }
 
