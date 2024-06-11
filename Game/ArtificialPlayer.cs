@@ -371,7 +371,7 @@ namespace Attack.Game
                 var neighbours = attack.Item2.GetNeighbours();
                 var destination = attack.Item1
                     .GetNeighbours()
-                    .FirstOrDefault(n => neighbours.Contains(n));
+                    .FirstOrDefault(n => neighbours.Contains(n) && _emptyTiles.ContainsKey(n));
 
                 if (destination == Vector2I.Zero)
                     return false;
@@ -454,7 +454,6 @@ namespace Attack.Game
                 return false;
 
             Log.Debug($"Found {friendlyNextToEnemy.Count} piece(s) next to an enemy");
-
 
             foreach (var selectedTile in friendlyNextToEnemy)
             {
