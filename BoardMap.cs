@@ -310,7 +310,8 @@ public partial class BoardMap : TileMap
 
 	private void ProcessSetupRightClick(Tile tile)
 	{
-		if (tile.IsEmpty() || tile.Piece.Team != Team.Blue)
+
+		if (tile.IsEmpty() || tile.Piece?.Team != Team.Blue)
 			return;
 
         var piece = tile.Piece;
