@@ -171,6 +171,11 @@ public partial class PieceNode : Node2D
                     AttackResult.Victory :
                     AttackResult.Defeat;
 
+            case PieceType.Spy:
+                return PieceType == PieceType.CommanderInChief ?
+                    AttackResult.Defeat :
+                    AttackResult.Victory;
+
             case PieceType.Flag:
                 return AttackResult.Victory;
 
