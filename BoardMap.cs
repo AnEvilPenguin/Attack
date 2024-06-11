@@ -359,6 +359,8 @@ public partial class BoardMap : TileMap
 
 	public void PlayTurn(Vector2I select, Vector2I end, Vector2I attack, bool replay = false)
 	{
+		Log.Debug($"Playing out {select} - {end} - {attack}");
+
         // There will always be a select
         Tile tile = lookup[select];
         ProcessGameLeftClick(tile); // probably a bodge

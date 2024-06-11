@@ -1,4 +1,5 @@
 using Godot;
+using Serilog;
 using System;
 
 internal enum PieceType // Interface Terrain?
@@ -158,6 +159,8 @@ public partial class PieceNode : Node2D
         // TODO logic for showing icons and tooltips and the like (not here)
         Spotted = true;
         defender.Spotted = true;
+
+        Log.Debug($"{PieceType} attacks {defender.PieceType}");
 
         switch (defender.PieceType)
         {

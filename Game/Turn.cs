@@ -42,7 +42,7 @@ namespace Attack.Game
                 if (tile.Piece.Range < 1)
                     return TurnAction.Invalid;
 
-                Log.Debug("Tile selected");
+                Log.Debug($"Tile selected {tile.Position}:{tile.Type}");
 
                 SelectedTile = tile;
                 return TurnAction.Select;
