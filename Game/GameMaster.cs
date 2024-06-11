@@ -73,7 +73,15 @@ namespace Attack.Game
 
                 AiTurn = true;
 
-                _aiPlayer.ProcessTurn();
+                try
+                {
+                    _aiPlayer.ProcessTurn();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to process AI player turn");
+                }
+                
 
                 AiTurn = false;
             }

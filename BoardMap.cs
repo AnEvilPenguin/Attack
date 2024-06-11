@@ -130,7 +130,7 @@ public partial class BoardMap : TileMap
 
         if (!lookup.TryGetValue(mapLocation, out Tile tile))
         {
-            Log.Debug("Click outside map");
+            //Log.Debug("Click outside map");
             return;
         }
 

@@ -35,30 +35,39 @@ namespace Attack.Game
 
             BuildLookups();
 
+            Log.Debug("Attempting to Attack Exposed");
             if (DirectAttackExposed())
                 return;
 
+            Log.Debug("Attempting to Attack Hidden");
             if (DirectAttackHidden())
                 return;
 
+            Log.Debug("Attempting to Move and then Attack Exposed");
             if (MoveThenAttackExposed())
                 return;
 
+            Log.Debug("Attempting to Move Scout");
             if (MoveScout())
                 return;
 
+            Log.Debug("Attempting to Move and then Attack Hidden");
             if (MoveThenAttackUnexposed())
                 return;
 
+            Log.Debug("Attempting to Move Engineer");
             if (MoveEngineer())
                 return;
 
+            Log.Debug("Attempting to Move Spy");
             if (MoveSpy())
                 return;
 
+            Log.Debug("Attempting to Move Low Ranks");
             if (MoveLowRank())
                 return;
 
+            Log.Debug("Attempting to Move High Ranks");
             if (MoveHighRank())
                 return;
 
@@ -362,7 +371,10 @@ namespace Attack.Game
                 var neighbours = attack.Item2.GetNeighbours();
                 var destination = attack.Item1
                     .GetNeighbours()
-                    .First(n => neighbours.Contains(n));
+                    .FirstOrDefault(n => neighbours.Contains(n));
+
+                if (destination == Vector2I.Zero)
+                    return false;
 
                 _board.PlayTurn(attack.Item1.Position, destination, attack.Item2.Position);
 
@@ -443,14 +455,20 @@ namespace Attack.Game
 
             Log.Debug($"Found {friendlyNextToEnemy.Count} piece(s) next to an enemy");
 
-            var selectedTile = friendlyNextToEnemy[0];
 
-            var target = selectedTile.GetNeighbours()
-                .Find(n => !_exposedEnemyTiles.ContainsKey(n) && _enemyTiles.ContainsKey(n));
+            foreach (var selectedTile in friendlyNextToEnemy)
+            {
+                var target = selectedTile.GetNeighbours()
+                    .Find(n => !_exposedEnemyTiles.ContainsKey(n) && _enemyTiles.ContainsKey(n));
 
-            _board.PlayTurn(selectedTile.Position, Vector2I.Zero, target);
-            return true;
+                if (target == Vector2I.Zero)
+                    continue;
 
+                _board.PlayTurn(selectedTile.Position, Vector2I.Zero, target);
+                return true;
+            }
+
+            return false;
         }
 
         private void BuildLookups()
