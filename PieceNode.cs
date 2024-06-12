@@ -8,14 +8,15 @@ internal enum PieceType // Interface Terrain?
     Spy,
     Scout,
     Engineer,
+    Private,
+    LanceCorporal,
+    Corporal,
     Sergeant,
     Lieutenant,
     Captain,
     Commandant,
     Colonel,
-    BrigadierGeneral,
-    CommanderInChief,
-    Flag
+    General
 }
 
 internal enum Team
@@ -78,7 +79,7 @@ public partial class PieceNode : Node2D
 
             switch (_pieceType) 
             {
-                case PieceType.Flag:
+                case PieceType.General:
                 case PieceType.Landmine:
                     Range = 0;
                     break;
@@ -163,17 +164,17 @@ public partial class PieceNode : Node2D
                     AttackResult.Victory :
                     AttackResult.Defeat;
 
-            case PieceType.CommanderInChief:
+            case PieceType.Colonel:
                 return PieceType == PieceType.Spy ?
                     AttackResult.Victory :
                     AttackResult.Defeat;
 
             case PieceType.Spy:
-                return PieceType == PieceType.CommanderInChief ?
+                return PieceType == PieceType.Colonel ?
                     AttackResult.Defeat :
                     AttackResult.Victory;
 
-            case PieceType.Flag:
+            case PieceType.General:
                 return AttackResult.Victory;
 
             default:

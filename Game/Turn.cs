@@ -86,7 +86,7 @@ namespace Attack.Game
             {
                 AttackedTile = tile;
 
-                bool defenderIsFlag = tile.Piece.PieceType == PieceType.Flag;
+                bool defenderIsFlag = tile.Piece.PieceType == PieceType.General;
 
                 Tile aggressor = DestinationTile != null ?
                     DestinationTile :
