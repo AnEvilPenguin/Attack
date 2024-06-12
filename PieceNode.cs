@@ -85,11 +85,6 @@ public partial class PieceNode : Node2D
         { 
             _pieceType = value;
 
-            setTooltipText();
-
-            if (Team == Team.Blue)
-                SetSprite();
-
             switch (_pieceType) 
             {
                 case PieceType.General:
@@ -141,11 +136,22 @@ public partial class PieceNode : Node2D
 
         setTooltipText();
         setShaderColor();
-	}
+    }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+    }
+
+    internal void ConfigurePiece(Team team, PieceType pieceType)
+    {
+        Team = team;
+        PieceType = pieceType;
+
+        setTooltipText();
+
+        if (Team == Team.Blue)
+            SetSprite();
     }
 
     private void SetSprite()
@@ -153,6 +159,7 @@ public partial class PieceNode : Node2D
         if (_sprite == null)
             return;
 
+        // In future I could probably just load/set the texture using piecetype if I rename the files
         switch (_pieceType)
         {
             case PieceType.Landmine:
