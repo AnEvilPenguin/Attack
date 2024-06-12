@@ -141,7 +141,7 @@ namespace Attack.Game
                 return false;
 
             var spy = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Spy);
-            var cic = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Colonel);
+            var cic = _exposedEnemyTiles.Values.First(t => t.Piece.PieceType == PieceType.Colonel);
 
             var distance = spy.DistanceFromTile(cic);
 
