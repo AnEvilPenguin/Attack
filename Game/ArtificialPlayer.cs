@@ -165,13 +165,14 @@ namespace Attack.Game
 
             Tile destination = null;
 
-            if (distance.X > 0 && _emptyTiles.ContainsKey(source.Position + east))
+            // TODO this need cleaning up somehow...
+            if (distance.X > 0 && _emptyTiles.ContainsKey(source.Position + east) && _emptyTiles[source.Position + east].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + east];
-            else if (distance.X < 0 && _emptyTiles.ContainsKey(source.Position + west))
+            else if (distance.X < 0 && _emptyTiles.ContainsKey(source.Position + west) && _emptyTiles[source.Position + west].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + west];
-            else if (distance.Y < 0 && _emptyTiles.ContainsKey(source.Position + north))
+            else if (distance.Y < 0 && _emptyTiles.ContainsKey(source.Position + north) && _emptyTiles[source.Position + north].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + north];
-            else if (distance.Y > 0 && _emptyTiles.ContainsKey(source.Position + south))
+            else if (distance.Y > 0 && _emptyTiles.ContainsKey(source.Position + south) && _emptyTiles[source.Position + south].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + south];
 
             return destination;
@@ -182,7 +183,7 @@ namespace Attack.Game
             if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.Landmine))
                 return false;
 
-            if (!HasPieceType(_friendlyTiles.Values, PieceType.Engineer)) 
+            if (!HasPieceType(_friendlyTiles.Values, PieceType.Engineer))
                 return false;
 
             var north = new Vector2I(0, -1);
@@ -229,7 +230,7 @@ namespace Attack.Game
             Tile destination = null;
             Tile attack = null;
 
-            void rollup (List<Tile> tiles, Tile scout, TileSet.CellNeighbor dir)
+            void rollup(List<Tile> tiles, Tile scout, TileSet.CellNeighbor dir)
             {
                 if (tiles.Count <= distance)
                     return;
@@ -330,7 +331,7 @@ namespace Attack.Game
 
             if (attackableValues.Count > 0)
             {
-                if(FindPieceToAttack(attackableValues))
+                if (FindPieceToAttack(attackableValues))
                     return true;
             }
 
