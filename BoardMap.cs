@@ -38,8 +38,7 @@ public partial class BoardMap : TileMap
         PieceNode piece = PieceScene.Instantiate<PieceNode>();
         AddChild(piece);
 
-		piece.Team = team;
-		piece.PieceType = type;
+		piece.ConfigurePiece(team, type);
 
         tile.AddPiece(piece);
 
@@ -176,8 +175,7 @@ public partial class BoardMap : TileMap
         PieceNode piece = PieceScene.Instantiate<PieceNode>();
         AddChild(piece);
 
-        piece.PieceType = _gameMaster.SelectedPieceType;
-        piece.Team = Team.Blue;
+		piece.ConfigurePiece(Team.Blue, _gameMaster.SelectedPieceType);
 
         tile.AddPiece(piece);
         _gameMaster.AssignPiece();
