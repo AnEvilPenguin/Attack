@@ -217,14 +217,14 @@ namespace Attack.Game
                 { PieceType.Spy, 0 },
                 { PieceType.Scout, 0 },
                 { PieceType.Engineer, 0 },
+                { PieceType.Private, 0 },
+                { PieceType.LanceCorporal, 0 },
+                { PieceType.Corporal, 0 },
                 { PieceType.Sergeant, 0 },
                 { PieceType.Lieutenant, 0 },
                 { PieceType.Captain, 0 },
-                { PieceType.Commandant, 0 },
                 { PieceType.Colonel, 0 },
-                { PieceType.BrigadierGeneral, 0 },
-                { PieceType.CommanderInChief, 0 },
-                { PieceType.Flag, 0 },
+                { PieceType.General, 0 },
             };
 
         public void StartGame()

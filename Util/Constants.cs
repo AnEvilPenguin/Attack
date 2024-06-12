@@ -24,14 +24,14 @@ namespace Attack.Util
                 { PieceType.Spy, 1 },
                 { PieceType.Scout, 8 },
                 { PieceType.Engineer, 5 },
-                { PieceType.Sergeant, 4 },
-                { PieceType.Lieutenant, 4 },
-                { PieceType.Captain, 4 },
-                { PieceType.Commandant, 3 },
-                { PieceType.Colonel, 2 },
-                { PieceType.BrigadierGeneral, 1 },
-                { PieceType.CommanderInChief, 1 },
-                { PieceType.Flag, 1 },
+                { PieceType.Private, 4 },
+                { PieceType.LanceCorporal, 4 },
+                { PieceType.Corporal, 4 },
+                { PieceType.Sergeant, 3 },
+                { PieceType.Lieutenant, 2 },
+                { PieceType.Captain, 1 },
+                { PieceType.Colonel, 1 },
+                { PieceType.General, 1 },
             };
 
         public const int GridSize = 12;

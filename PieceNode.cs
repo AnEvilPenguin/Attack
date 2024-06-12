@@ -8,14 +8,14 @@ internal enum PieceType // Interface Terrain?
     Spy,
     Scout,
     Engineer,
+    Private,
+    LanceCorporal,
+    Corporal,
     Sergeant,
     Lieutenant,
     Captain,
-    Commandant,
     Colonel,
-    BrigadierGeneral,
-    CommanderInChief,
-    Flag
+    General
 }
 
 internal enum Team
@@ -36,13 +36,22 @@ public partial class PieceNode : Node2D
     private Team _team;
 
     // consider changing team to class and exposing in godot ui?
-    private static Color red1 = new Color((float)0.6745, (float)0.1961, (float)0.1961, (float)1);
-    private static Color red2 = new Color((float)0.3945, (float)0.0997, 0, 1);
-    private static Color red3 = new Color((float)0.1086, (float)0.0107, (float)0.0109, 1);
+    private static Color _red1 = new Color(1, 0, 0, 1);
 
-    private static Color blue1 = new Color((float)0.2020, (float)0.1940, (float)0.67, (float)1);
-    private static Color blue2 = new Color((float)0.0060, 0, (float)0.39, 1);
-    private static Color blue3 = new Color((float)0.013, (float)0.011, (float)0.11, 1);
+    private static Color _blue1 = new Color(0, 0, 1, 1);
+
+    private static Texture2D _landmine = GD.Load<Texture2D>("res://Art/Chip01 - Mine.png");
+    private static Texture2D _spy = GD.Load<Texture2D>("res://Art/Chip02 - Spy.png");
+    private static Texture2D _scout = GD.Load<Texture2D>("res://Art/Chip03 - Scout.png");
+    private static Texture2D _engineer = GD.Load<Texture2D>("res://Art/Chip04 - Engineer.png");
+    private static Texture2D _private = GD.Load<Texture2D>("res://Art/Chip05 - Private.png");
+    private static Texture2D _lanceCorporal = GD.Load<Texture2D>("res://Art/Chip06 - LanceCorporal.png");
+    private static Texture2D _corporal = GD.Load<Texture2D>("res://Art/Chip07 - Corporal.png");
+    private static Texture2D _sergeant = GD.Load<Texture2D>("res://Art/Chip08 - Sergeant.png");
+    private static Texture2D _lieutenant = GD.Load<Texture2D>("res://Art/Chip09 - Lieutenant.png");
+    private static Texture2D _captain = GD.Load<Texture2D>("res://Art/Chip10 - Captain.png");
+    private static Texture2D _colonel = GD.Load<Texture2D>("res://Art/Chip11 - Colonel.png");
+    private static Texture2D _general = GD.Load<Texture2D>("res://Art/Chip12 - General.png");
 
     [Export]
     internal Team Team {
@@ -78,9 +87,12 @@ public partial class PieceNode : Node2D
 
             setTooltipText();
 
+            if (Team == Team.Blue)
+                SetSprite();
+
             switch (_pieceType) 
             {
-                case PieceType.Flag:
+                case PieceType.General:
                 case PieceType.Landmine:
                     Range = 0;
                     break;
@@ -101,7 +113,19 @@ public partial class PieceNode : Node2D
 
     private Control _control;
 
-    public bool Spotted = false;
+    private bool _spotted = false;
+    public bool Spotted { 
+        get => _spotted; 
+        set 
+        { 
+            _spotted = value;
+
+            if (_spotted)
+            {
+                SetSprite();
+            }
+        }
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -124,6 +148,63 @@ public partial class PieceNode : Node2D
 	{
     }
 
+    private void SetSprite()
+    {
+        if (_sprite == null)
+            return;
+
+        switch (_pieceType)
+        {
+            case PieceType.Landmine:
+                _sprite.Texture = _landmine;
+                return;
+
+            case PieceType.Scout:
+                _sprite.Texture = _scout;
+                return;
+
+            case PieceType.Spy:
+                _sprite.Texture = _spy;
+                return;
+
+            case PieceType.Engineer:
+                _sprite.Texture = _engineer;
+                return;
+
+            case PieceType.Private:
+                _sprite.Texture = _private;
+                return;
+
+            case PieceType.LanceCorporal:
+                _sprite.Texture = _lanceCorporal;
+                return;
+
+            case PieceType.Corporal:
+                _sprite.Texture = _corporal;
+                return;
+
+            case PieceType.Sergeant:
+                _sprite.Texture = _sergeant;
+                return;
+
+            case PieceType.Lieutenant:
+                _sprite.Texture = _lieutenant;
+                return;
+
+            case PieceType.Captain:
+                _sprite.Texture = _captain;
+                return;
+
+            case PieceType.Colonel:
+                _sprite.Texture = _colonel;
+                return;
+
+            case PieceType.General:
+                _sprite.Texture = _general;
+                return;
+        }
+    }
+
     private void setTooltipText()
     {
         if (_control == null)
@@ -142,15 +223,11 @@ public partial class PieceNode : Node2D
             //var propertyList = _material.GetPropertyList();
             //var color1 = _material.Get("shader_parameter/color1");
 
-            _material.Set("shader_parameter/color1", red1);
-            _material.Set("shader_parameter/color2", red2);
-            _material.Set("shader_parameter/color3", red3);
+            _material.Set("shader_parameter/color1", _red1);
         }
         else
         {
-            _material.Set("shader_parameter/color1", blue1);
-            _material.Set("shader_parameter/color2", blue2);
-            _material.Set("shader_parameter/color3", blue3);
+            _material.Set("shader_parameter/color1", _blue1);
         }
     }
 
@@ -169,17 +246,17 @@ public partial class PieceNode : Node2D
                     AttackResult.Victory :
                     AttackResult.Defeat;
 
-            case PieceType.CommanderInChief:
+            case PieceType.Colonel:
                 return PieceType == PieceType.Spy ?
                     AttackResult.Victory :
                     AttackResult.Defeat;
 
             case PieceType.Spy:
-                return PieceType == PieceType.CommanderInChief ?
+                return PieceType == PieceType.Colonel ?
                     AttackResult.Defeat :
                     AttackResult.Victory;
 
-            case PieceType.Flag:
+            case PieceType.General:
                 return AttackResult.Victory;
 
             default:

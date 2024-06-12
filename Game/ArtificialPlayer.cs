@@ -134,14 +134,14 @@ namespace Attack.Game
 
         private bool MoveSpy()
         {
-            if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.CommanderInChief))
+            if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.Colonel))
                 return false;
 
             if (!HasPieceType(_friendlyTiles.Values, PieceType.Spy))
                 return false;
 
             var spy = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Spy);
-            var cic = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.CommanderInChief);
+            var cic = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Colonel);
 
             var distance = spy.DistanceFromTile(cic);
 
