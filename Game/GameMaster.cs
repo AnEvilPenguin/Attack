@@ -279,10 +279,10 @@ namespace Attack.Game
         public void RegisterNotification(Notification notification) =>
             _notification = notification;
 
-        public void CompleteTurn(bool replay = false)
+        public void CompleteTurn()
         {
             // TODO entire forward/back feature.
-            if (replay)
+            if (!GameStarted)
             {
                 Log.Debug("End of replay turn");
             }
@@ -293,9 +293,17 @@ namespace Attack.Game
 
             _board.ClearAllOverlayElements();
 
-            if (!replay)
+            if (GameStarted)
+            {
                 _sqlSaveManager.SaveGame(_gameInstance, CurrentTurn);
 
+                if (CurrentTurn.TeamPlaying == Team.Red)
+                {
+                    _notification.SendNotification(CurrentTurn.TurnSummary);
+                    NotificationShowing = true;
+                }  
+            }
+                
             // TODO push turn into stack here
             CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
 
