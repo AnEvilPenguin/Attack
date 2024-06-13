@@ -141,6 +141,17 @@ namespace Attack.Game
             return list;
         }
 
+        public bool IsCloserToPosition(Vector2I position, Vector2I target)
+        {
+            var distancePosition = position - target;
+            var distance = Position - target;
+
+            return distance.Abs() < distancePosition.Abs();
+        }
+
+        public bool IsCloserToTile(Tile tile, Tile target) =>
+            IsCloserToPosition(tile.Position, target.Position);
+
         public Vector2I DistanceFromPosition(Vector2I position) =>
             position - Position;
 

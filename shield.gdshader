@@ -5,6 +5,7 @@ void vertex() {
 }
 
 uniform vec4 color1 : source_color;
+uniform bool exposed;
 
 void fragment() {
 	// Called for every pixel the material is visible on.
@@ -15,7 +16,10 @@ void fragment() {
 	// .r = red, .b = blue, .g = green, .a = alpha
 	// COLOR = vec4(input_color.r, input_color.b, input_color.g, input_color.a);
 	
-	if (input_color.a == 0.0 || input_color.g > 0.7) {
+	if (input_color.g > 0.7 && !exposed) {
+		COLOR = vec4(0.7, 0.7, 0.7, 1.7);
+	}
+	else if (input_color.a == 0.0 || input_color.g > 0.7) {
 		COLOR = input_color;
 	}
 	else {

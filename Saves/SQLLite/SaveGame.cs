@@ -129,6 +129,8 @@ namespace Attack.Saves.SQLLite
 
                     if (endDate is not DBNull)
                         instance.CompletedDate = DateTime.Parse(endDate.ToString());
+
+                    instance.StartingTeam = (Team)(int)(long)reader.GetValue(7);
                 }
             }
 

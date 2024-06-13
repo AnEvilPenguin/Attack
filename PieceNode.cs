@@ -117,7 +117,10 @@ public partial class PieceNode : Node2D
 
             if (_spotted)
             {
+                // TODO Set shader to treat white as white to indicate the unit is spotted.
+                setTooltipText();
                 SetSprite();
+                _material.Set("shader_parameter/exposed", true);
             }
         }
     }
@@ -217,7 +220,11 @@ public partial class PieceNode : Node2D
         if (_control == null)
             return;
 
-        _control.TooltipText = $"{_pieceType} ({(int)_pieceType})"; // TODO only show tooltip if piece is 'exposed'
+        string text = _spotted ?
+            $"{_pieceType} (Rank: {(int)_pieceType}) - Spotted" :
+            $"{_pieceType} (Rank: {(int)_pieceType})";
+
+        _control.TooltipText = text; // TODO only show tooltip if piece is 'exposed'
     }
 
     private void setShaderColor()

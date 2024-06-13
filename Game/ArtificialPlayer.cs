@@ -39,16 +39,16 @@ namespace Attack.Game
             if (DirectAttackExposed())
                 return;
 
-            Log.Debug("Attempting to Attack Hidden");
-            if (DirectAttackHidden())
-                return;
-
             Log.Debug("Attempting to Move and then Attack Exposed");
             if (MoveThenAttackExposed())
                 return;
 
             Log.Debug("Attempting to Move Scout");
             if (MoveScout())
+                return;
+
+            Log.Debug("Attempting to Attack Hidden");
+            if (DirectAttackHidden())
                 return;
 
             Log.Debug("Attempting to Move and then Attack Hidden");
@@ -79,7 +79,7 @@ namespace Attack.Game
             MoveByRank(t => (int)t.Piece.PieceType > 5);
 
         private bool MoveLowRank() =>
-            MoveByRank(t => (int)t.Piece.PieceType <= 5);
+            MoveByRank(t => (int)t.Piece.PieceType <= 5 && (int)t.Piece.PieceType > 1);
 
         private bool MoveByRank(Func<Tile, bool> filter)
         {
@@ -141,7 +141,7 @@ namespace Attack.Game
                 return false;
 
             var spy = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Spy);
-            var cic = _friendlyTiles.Values.First(t => t.Piece.PieceType == PieceType.Colonel);
+            var cic = _exposedEnemyTiles.Values.First(t => t.Piece.PieceType == PieceType.Colonel);
 
             var distance = spy.DistanceFromTile(cic);
 
@@ -165,13 +165,14 @@ namespace Attack.Game
 
             Tile destination = null;
 
-            if (distance.X > 0 && _emptyTiles.ContainsKey(source.Position + east))
+            // TODO this need cleaning up somehow...
+            if (distance.X > 0 && _emptyTiles.ContainsKey(source.Position + east) && _emptyTiles[source.Position + east].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + east];
-            else if (distance.X < 0 && _emptyTiles.ContainsKey(source.Position + west))
+            else if (distance.X < 0 && _emptyTiles.ContainsKey(source.Position + west) && _emptyTiles[source.Position + west].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + west];
-            else if (distance.Y < 0 && _emptyTiles.ContainsKey(source.Position + north))
+            else if (distance.Y < 0 && _emptyTiles.ContainsKey(source.Position + north) && _emptyTiles[source.Position + north].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + north];
-            else if (distance.Y > 0 && _emptyTiles.ContainsKey(source.Position + south))
+            else if (distance.Y > 0 && _emptyTiles.ContainsKey(source.Position + south) && _emptyTiles[source.Position + south].IsCloserToTile(source, target))
                 destination = _emptyTiles[source.Position + south];
 
             return destination;
@@ -182,7 +183,7 @@ namespace Attack.Game
             if (!HasPieceType(_exposedEnemyTiles.Values, PieceType.Landmine))
                 return false;
 
-            if (!HasPieceType(_friendlyTiles.Values, PieceType.Engineer)) 
+            if (!HasPieceType(_friendlyTiles.Values, PieceType.Engineer))
                 return false;
 
             var north = new Vector2I(0, -1);
@@ -229,7 +230,7 @@ namespace Attack.Game
             Tile destination = null;
             Tile attack = null;
 
-            void rollup (List<Tile> tiles, Tile scout, TileSet.CellNeighbor dir)
+            void rollup(List<Tile> tiles, Tile scout, TileSet.CellNeighbor dir)
             {
                 if (tiles.Count <= distance)
                     return;
@@ -330,7 +331,7 @@ namespace Attack.Game
 
             if (attackableValues.Count > 0)
             {
-                if(FindPieceToAttack(attackableValues))
+                if (FindPieceToAttack(attackableValues))
                     return true;
             }
 
@@ -502,6 +503,9 @@ namespace Attack.Game
             foreach (var pair in _friendlyTiles)
             {
                 var tile = pair.Value;
+
+                if (tile.Piece.PieceType == PieceType.Spy || tile.Piece.PieceType == PieceType.Engineer)
+                    continue;
 
                 bool nextToEnemy = tile.GetNeighbours()
                     .Find(action) != Vector2I.Zero;

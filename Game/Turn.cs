@@ -22,11 +22,29 @@ namespace Attack.Game
         Dictionary<Vector2I, Tile> ValidMoves = new Dictionary<Vector2I, Tile>();
         Dictionary<Vector2I, Tile> ValidAttacks = new Dictionary<Vector2I, Tile>();
 
+        private PieceNode _selectedPiece;
+
         public Team TeamPlaying { get; set; }
+
+        private string _turnSummary = String.Empty;
 
         internal Turn (Team currentTeam)
         {
             TeamPlaying = currentTeam;
+        }
+
+        public string TurnSummary 
+        { 
+            get
+            { 
+                if (_selectedPiece == null)
+                    return _turnSummary;
+
+                if (_selectedPiece.Spotted)
+                    return $"{TeamPlaying} {_selectedPiece.PieceType} {_turnSummary}";
+
+                return $"{TeamPlaying} piece {_turnSummary}";
+            }
         }
 
         public TurnAction ProcessLeftClick(Tile tile, Vector2I cell)
@@ -44,7 +62,10 @@ namespace Attack.Game
 
                 Log.Debug($"Tile selected {tile.Position}:{tile.Type}");
 
+                _turnSummary = $"from {tile.Position}";
+
                 SelectedTile = tile;
+                _selectedPiece = tile.Piece;
                 return TurnAction.Select;
             } 
             else if (SelectedTile != null && DestinationTile == null && tile.Piece?.Team == TeamPlaying)
@@ -55,7 +76,10 @@ namespace Attack.Game
 
                 Log.Debug("Tile re-selected");
 
+                _turnSummary = $"from {tile.Position}";
+
                 SelectedTile = tile;
+                _selectedPiece = tile.Piece;
                 return TurnAction.Select;
             }
 
@@ -79,6 +103,8 @@ namespace Attack.Game
                 DestinationTile.AddPiece(SelectedTile.Piece);
                 SelectedTile.RemovePiece();
 
+                _turnSummary += $" moves to {tile.Position}";
+
                 return TurnAction.Move;
             }
 
@@ -93,6 +119,8 @@ namespace Attack.Game
                     SelectedTile;
 
                 var result = aggressor.Piece.Attacks(tile.Piece);
+
+                _turnSummary += $" and attacks {tile.Piece.Team} {tile.Piece.PieceType} at {tile.Position} resulting in a {result}";
 
                 if (result == AttackResult.Victory)
                 {

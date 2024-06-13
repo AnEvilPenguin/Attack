@@ -280,7 +280,7 @@ public partial class BoardMap : TileMap
 				Log.Debug("End of turn");
 
 				// No take backsies for the player
-				if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue)
+				if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue && _gameMaster.GameStarted)
 					_gameMaster.CompleteTurn();
 
 				return;
@@ -353,10 +353,10 @@ public partial class BoardMap : TileMap
 		var end = turn[1];
 		var attack = turn[2];
 		
-		PlayTurn(select, end, attack, true);
+		PlayTurn(select, end, attack);
     }
 
-	public void PlayTurn(Vector2I select, Vector2I end, Vector2I attack, bool replay = false)
+	public void PlayTurn(Vector2I select, Vector2I end, Vector2I attack)
 	{
 		Log.Debug($"Playing out {select} - {end} - {attack}");
 
@@ -376,6 +376,6 @@ public partial class BoardMap : TileMap
             ProcessGameLeftClick(tile);
         }
 
-		_gameMaster.CompleteTurn(replay);
+		_gameMaster.CompleteTurn();
     }
 }
