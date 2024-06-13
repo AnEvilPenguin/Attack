@@ -80,6 +80,7 @@ namespace Attack.Game
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Failed to process AI player turn");
+                    GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
                 }
                 
 
