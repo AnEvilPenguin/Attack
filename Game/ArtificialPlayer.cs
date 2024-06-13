@@ -39,16 +39,16 @@ namespace Attack.Game
             if (DirectAttackExposed())
                 return;
 
-            Log.Debug("Attempting to Attack Hidden");
-            if (DirectAttackHidden())
-                return;
-
             Log.Debug("Attempting to Move and then Attack Exposed");
             if (MoveThenAttackExposed())
                 return;
 
             Log.Debug("Attempting to Move Scout");
             if (MoveScout())
+                return;
+
+            Log.Debug("Attempting to Attack Hidden");
+            if (DirectAttackHidden())
                 return;
 
             Log.Debug("Attempting to Move and then Attack Hidden");
