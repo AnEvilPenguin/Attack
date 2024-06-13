@@ -79,7 +79,7 @@ namespace Attack.Game
             MoveByRank(t => (int)t.Piece.PieceType > 5);
 
         private bool MoveLowRank() =>
-            MoveByRank(t => (int)t.Piece.PieceType <= 5);
+            MoveByRank(t => (int)t.Piece.PieceType <= 5 && (int)t.Piece.PieceType > 1);
 
         private bool MoveByRank(Func<Tile, bool> filter)
         {
