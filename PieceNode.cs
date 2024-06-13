@@ -117,8 +117,10 @@ public partial class PieceNode : Node2D
 
             if (_spotted)
             {
+                // TODO Set shader to treat white as white to indicate the unit is spotted.
                 setTooltipText();
                 SetSprite();
+                _material.Set("shader_parameter/exposed", true);
             }
         }
     }
