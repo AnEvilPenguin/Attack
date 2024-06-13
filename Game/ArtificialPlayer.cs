@@ -504,6 +504,9 @@ namespace Attack.Game
             {
                 var tile = pair.Value;
 
+                if (tile.Piece.PieceType == PieceType.Spy || tile.Piece.PieceType == PieceType.Engineer)
+                    continue;
+
                 bool nextToEnemy = tile.GetNeighbours()
                     .Find(action) != Vector2I.Zero;
 
