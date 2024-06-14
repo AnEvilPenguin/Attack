@@ -112,10 +112,10 @@ As a stretch goal we can consider keyboard/controller.
 - [X] Save Game/Load Game system
 - [X] Piece selection and movement
 - [X] Basic Piece combat
-- [ ] Full Piece implementation
+- [X] Full Piece implementation
 - [X] Player Transition
 - [X] Computer player
-- [ ] Full Art Assets
+- [X] Full Art Assets
 
 ## Stretch
 
