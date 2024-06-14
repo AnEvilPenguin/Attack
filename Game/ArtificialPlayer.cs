@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Godot.Time;
@@ -297,12 +298,13 @@ namespace Attack.Game
             {
                 var targets = getNeighboursAndTargets(tile, _enemyTiles.Values);
 
-                if (targets.Count > 0)
+                foreach (var tuple in targets)
                 {
-                    var first = targets.First();
+                    var destination = tuple.Item2;
+                    var attack = tuple.Item1;
 
-                    var destination = first.Item2;
-                    var attack = first.Item1;
+                    if (attack.Piece != null && attack.Piece.Spotted && !IsSensibleAttack(tile.Piece, attack.Piece))
+                        continue;
 
                     _board.PlayTurn(tile.Position, destination.Position, attack.Position);
                     return true;
@@ -325,7 +327,8 @@ namespace Attack.Game
 
                 foreach (var attackableTile in attackableExposed)
                 {
-                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                    if (IsSensibleAttack(tile.Piece, _exposedEnemyTiles[attackableTile].Piece))
+                        attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
                 }
             }
 
@@ -342,7 +345,8 @@ namespace Attack.Game
 
                 foreach (var attackableTile in attackableExposed)
                 {
-                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                    if (IsSensibleAttack(tile.Piece, _exposedEnemyTiles[attackableTile].Piece))
+                        attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
                 }
             }
 
@@ -417,7 +421,7 @@ namespace Attack.Game
 
         private bool IsSensibleAttack(PieceNode attaker, PieceNode defender)
         {
-            if (attaker.Attacks(defender) == AttackResult.Victory)
+            if (attaker.Attacks(defender, true) == AttackResult.Victory)
                 return true;
 
             Log.Debug($"Not a sensible attack {attaker.PieceType} => {defender.PieceType}");
