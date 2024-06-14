@@ -138,6 +138,15 @@ namespace Attack.Game
         {
             Log.Debug("Creating new game");
 
+            GameOver = false;
+            GameStarted = false;
+            CanCompleteTurn = false;
+            NotificationShowing = false;
+            LoadGame = false;
+            AiTurn = false;
+
+            _initialPlacements = null;
+
             try
             {
                 _gameInstance = _sqlSaveManager.NewGame();
@@ -183,6 +192,8 @@ namespace Attack.Game
                 {
                     _board.ReplayTurn(_protoTurns.Dequeue());
                 }
+
+                _protoTurns = null;
 
                 GameStarted = true;
                 return;
@@ -318,7 +329,7 @@ namespace Attack.Game
                     NotificationShowing = true;
                 }  
             }
-                
+
             var hasMorePieces = _board.ListPieces().Any(t => t.Piece.Team != CurrentTurn.TeamPlaying && t.Piece.Range > 0);
             if (!hasMorePieces)
             {
