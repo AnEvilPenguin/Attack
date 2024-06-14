@@ -410,13 +410,11 @@ namespace Attack.Game
                 if (destination == Vector2I.Zero)
                     continue;
 
-                // doesn't matter if this is Zero or not
-                var attack = _emptyTiles[destination].GetNeighbours()
-                    .FirstOrDefault(n => _enemyTiles.ContainsKey(n));
-
-                _board.PlayTurn(tile.Position, destination, attack);
+                _board.PlayTurn(tile.Position, destination, Vector2I.Zero);
                 return;
             }
+
+            throw new Exception("Unable to find random move to make");
         }
 
         private bool IsSensibleAttack(PieceNode attaker, PieceNode defender)
