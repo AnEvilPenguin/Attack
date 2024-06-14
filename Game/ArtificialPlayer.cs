@@ -94,6 +94,7 @@ namespace Attack.Game
             {
                 int shortestDistance = -1;
                 var closestEnemies = _enemyTiles.Values
+                    .Where(t => !t.Piece.Spotted || IsSensibleAttack(tile.Piece, t.Piece))
                     .OrderBy(t =>
                     {
                         var abs = tile.DistanceFromTile(t).Abs();
