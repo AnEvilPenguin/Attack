@@ -10,7 +10,8 @@ namespace Attack.Game
         Invalid,
         Select,
         Move,
-        Attack
+        Attack,
+        EndGame
     }
 
     internal class Turn
@@ -136,8 +137,9 @@ namespace Attack.Game
                     aggressor.RemovePiece();
                     piece.QueueFree();
                 }
-                    
-                // TODO handle case where flag is captured;
+
+                if (defenderIsFlag)
+                    return TurnAction.EndGame;
 
                 return TurnAction.Attack;
             }

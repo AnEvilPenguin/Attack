@@ -24,6 +24,7 @@ namespace Attack.Game
         public bool NotificationShowing = false;
         public bool LoadGame = false;
         public bool AiTurn = false;
+        public bool GameOver = false;
 
         private List<PieceNode> _initialPlacements;
         private Queue<Vector2I[]> _protoTurns;
@@ -60,6 +61,17 @@ namespace Attack.Game
         // Called every frame. 'delta' is the elapsed time since the previous frame.
         public override void _Process(double delta)
         {
+            if (_gameInstance != null && GameOver && !NotificationShowing)
+            {
+                // Game Over
+                Log.Information("Game over - Exiting game");
+                GetTree().ChangeSceneToFile("res://main_menu.tscn");
+                GameOver = false;
+                GameStarted = false;
+                CurrentTurn = null;
+                return;
+            }
+
             if (!GameStarted) 
                 return;
 
@@ -110,6 +122,8 @@ namespace Attack.Game
 
         public void Load(int id)
         {
+            GameOver = false;
+
             _gameInstance = _sqlSaveManager.LoadGame(_latestGameId);
 
             _initialPlacements = _sqlSaveManager.LoadPieces(_gameInstance);
@@ -305,10 +319,30 @@ namespace Attack.Game
                 }  
             }
                 
+            var hasMorePieces = _board.ListPieces().Any(t => t.Piece.Team != CurrentTurn.TeamPlaying && t.Piece.Range > 0);
+            if (!hasMorePieces)
+            {
+                EndGame();
+                return;
+            }
+
             // TODO push turn into stack here
             CurrentTurn = new Turn(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red);
 
             CanCompleteTurn = false;
+        }
+
+        public void EndGame()
+        {
+            Log.Information($"Game over - {CurrentTurn.TeamPlaying} wins!");
+
+            _gameInstance.CompletedDate = DateTime.UtcNow;
+            _sqlSaveManager.SaveGame(_gameInstance);
+
+            _notification.SendNotification($"{CurrentTurn.TeamPlaying} wins!");
+            NotificationShowing = true;
+
+            GameOver = true;
         }
     }
 }
