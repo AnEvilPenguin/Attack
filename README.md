@@ -108,7 +108,7 @@ As a stretch goal we can consider keyboard/controller.
 - [X] Placeholder Art Assets
 - [X] Main Menu
 - [X] Level and Game Implementation
-- [ ] Pause menu
+- [X] Pause menu
 - [X] Save Game/Load Game system
 - [X] Piece selection and movement
 - [X] Basic Piece combat
