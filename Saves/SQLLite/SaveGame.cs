@@ -227,7 +227,11 @@ namespace Attack.Saves.SQLLite
 
                 try 
                 {
-                    return (int)(long)command.ExecuteScalar();
+                    var output = command.ExecuteScalar();
+                    if (output != null)
+                        return (int)(long)output;
+
+                    return -1;
                 }
                 catch (Exception ex)
                 {

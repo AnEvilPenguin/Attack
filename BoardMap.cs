@@ -114,6 +114,9 @@ public partial class BoardMap : TileMap
 
 		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
+		if (_gameMaster.GameOver)
+			return;
+
 		var turn = _gameMaster.CurrentTurn;
 
 		if (turn == null || turn.SelectedTile == null)
@@ -240,6 +243,9 @@ public partial class BoardMap : TileMap
 
         tiles.ForEach(t => EraseCell((int)MapLayer.Highlight, t.Position));
 
+		if (_gameMaster.GameOver)
+			return;
+
 		var turn = _gameMaster.CurrentTurn;
 		var turnAction = turn.ProcessLeftClick(tile, tile.Position);
 
@@ -279,14 +285,27 @@ public partial class BoardMap : TileMap
 			case TurnAction.Attack:
 				Log.Debug("End of turn");
 
-				// No take backsies for the player
-				if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue && _gameMaster.GameStarted)
+				// If enemy can't move any more pieces end the game.
+				var hasMorePieces = ListPieces().Any(t => t.Piece.Team != turn.TeamPlaying && t.Piece.Range > 0);
+                if (!hasMorePieces)
+				{
+                    _gameMaster.EndGame();
+					return;
+                }
+                    
+
+                // No take backsies for the player
+                if (_gameMaster.CurrentTurn.TeamPlaying == Team.Blue && _gameMaster.GameStarted)
 					_gameMaster.CompleteTurn();
 
 				return;
 
 			case TurnAction.Invalid:
 				Log.Debug("Invalid action");
+				return;
+
+			case TurnAction.EndGame:
+				_gameMaster.EndGame();
 				return;
 		}
     }
