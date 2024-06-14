@@ -65,14 +65,11 @@ namespace Attack.Game
             {
                 // Game Over
                 Log.Information("Game over - Exiting game");
-                GetTree().ChangeSceneToFile("res://main_menu.tscn");
-                GameOver = false;
-                GameStarted = false;
-                CurrentTurn = null;
+                Escape();
                 return;
             }
 
-            if (!GameStarted) 
+            if (!GameStarted)
                 return;
 
             if (CurrentTurn == null)
@@ -94,7 +91,7 @@ namespace Attack.Game
                     Log.Error(ex, "Failed to process AI player turn");
                     GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
                 }
-                
+
 
                 AiTurn = false;
             }
@@ -137,15 +134,6 @@ namespace Attack.Game
         public void New()
         {
             Log.Debug("Creating new game");
-
-            GameOver = false;
-            GameStarted = false;
-            CanCompleteTurn = false;
-            NotificationShowing = false;
-            LoadGame = false;
-            AiTurn = false;
-
-            _initialPlacements = null;
 
             try
             {
@@ -225,11 +213,11 @@ namespace Attack.Game
             // We need to instantiate the piece from the board otherwise we lose things like shaders and materials.
             // Otherwise I need to create that from code from scratch
             //     (as I should do next time I intend to do this sort of thing)
-            foreach (var piece in _initialPlacements) 
+            foreach (var piece in _initialPlacements)
             {
                 _board.CreatePiece((Vector2I)piece.Position, piece.PieceType, piece.Team);
 
-                if(piece.Team == Team.Blue)
+                if (piece.Team == Team.Blue)
                     _playerPieceCount[piece.PieceType]++;
 
                 piece.QueueFree();
@@ -292,7 +280,7 @@ namespace Attack.Game
         {
             if (what == NotificationWMCloseRequest)
             {
-                if(GameStarted)
+                if (GameStarted)
                     return;
 
                 Log.Debug("Cleaning up unstarted game");
@@ -327,7 +315,7 @@ namespace Attack.Game
                 {
                     _notification.SendNotification(CurrentTurn.TurnSummary);
                     NotificationShowing = true;
-                }  
+                }
             }
 
             var hasMorePieces = _board.ListPieces().Any(t => t.Piece.Team != CurrentTurn.TeamPlaying && t.Piece.Range > 0);
@@ -354,6 +342,31 @@ namespace Attack.Game
             NotificationShowing = true;
 
             GameOver = true;
+        }
+
+        public void Escape()
+        {
+            // unload all assets
+            if (!GameStarted)
+                _sqlSaveManager.DeleteGame(_gameInstance);
+
+            GameOver = false;
+            GameStarted = false;
+            CanCompleteTurn = false;
+            NotificationShowing = false;
+            LoadGame = false;
+            AiTurn = false;
+
+            CurrentTurn = null;
+            _playerPieceCount = null;
+            _initialPlacements = null;
+            _notification = null;
+            _aiPlayer = null;
+
+            _latestGameId = -1;
+
+            // Back to main menu
+            GetTree().ChangeSceneToFile("res://main_menu.tscn");
         }
     }
 }

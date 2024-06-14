@@ -112,7 +112,14 @@ public partial class BoardMap : TileMap
             _gameMaster.CreateGame(this);
         }
 
-		tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
+        if (Input.IsActionJustPressed("Escape"))
+		{
+			Log.Debug("Escape pressed");
+			_gameMaster.Escape();
+			return;
+		}
+
+        tiles.ForEach(t => EraseCell((int)MapLayer.Overlay, t.Position));
 
 		if (_gameMaster.GameOver)
 			return;
