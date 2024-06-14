@@ -70,18 +70,18 @@ public partial class PieceSelector : Control
         }
 
 
-        _landmineButton.Text = $"Landmine ({_gameMaster.GetPieceCount(PieceType.Landmine)})";
-        _spyButton.Text = $"Spy ({_gameMaster.GetPieceCount(PieceType.Spy)})";
-        _scoutButton.Text = $"Scout ({_gameMaster.GetPieceCount(PieceType.Scout)})";
-        _engineerButton.Text = $"Engineer ({_gameMaster.GetPieceCount(PieceType.Engineer)})";
-        _sergeantButton.Text = $"Sergeant ({_gameMaster.GetPieceCount(PieceType.Private)})";
-        _lieutenantButton.Text = $"Lieutenant ({_gameMaster.GetPieceCount(PieceType.LanceCorporal)})";
-        _captainButton.Text = $"Captain ({_gameMaster.GetPieceCount(PieceType.Corporal)})";
-        _commandantButton.Text = $"Commandant ({_gameMaster.GetPieceCount(PieceType.Sergeant)})";
-        _colonelButton.Text = $"Colonel ({_gameMaster.GetPieceCount(PieceType.Lieutenant)})";
-        _brigadierGeneralButton.Text = $"Brigadier General ({_gameMaster.GetPieceCount(PieceType.Captain)})";
-        _commanderInChiefButton.Text = $"Commander-in-chief ({_gameMaster.GetPieceCount(PieceType.Colonel)})";
-        _flagButton.Text = $"Flag ({_gameMaster.GetPieceCount(PieceType.General)})";
+        _landmineButton.Text = $"{PieceType.Landmine} ({_gameMaster.GetPieceCount(PieceType.Landmine)})";
+        _spyButton.Text = $"{PieceType.Spy} ({_gameMaster.GetPieceCount(PieceType.Spy)})";
+        _scoutButton.Text = $"{PieceType.Scout} ({_gameMaster.GetPieceCount(PieceType.Scout)})";
+        _engineerButton.Text = $"{PieceType.Engineer} ({_gameMaster.GetPieceCount(PieceType.Engineer)})";
+        _sergeantButton.Text = $"{PieceType.Private} ({_gameMaster.GetPieceCount(PieceType.Private)})";
+        _lieutenantButton.Text = $"{PieceType.LanceCorporal} ({_gameMaster.GetPieceCount(PieceType.LanceCorporal)})";
+        _captainButton.Text = $"{PieceType.Corporal} ({_gameMaster.GetPieceCount(PieceType.Corporal)})";
+        _commandantButton.Text = $"{PieceType.Sergeant} ({_gameMaster.GetPieceCount(PieceType.Sergeant)})";
+        _colonelButton.Text = $"{PieceType.Lieutenant} ({_gameMaster.GetPieceCount(PieceType.Lieutenant)})";
+        _brigadierGeneralButton.Text = $"{PieceType.Captain} ({_gameMaster.GetPieceCount(PieceType.Captain)})";
+        _commanderInChiefButton.Text = $"{PieceType.Colonel} ({_gameMaster.GetPieceCount(PieceType.Colonel)})";
+        _flagButton.Text = $"{PieceType.General} ({_gameMaster.GetPieceCount(PieceType.General)})";
 
         if (_startButton.Disabled && _gameMaster.IsPlacementComplete())
         {
