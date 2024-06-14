@@ -359,6 +359,9 @@ namespace Attack.Game
 
             foreach (var tuple in attackableValues)
             {
+                if (!IsSensibleAttack(tuple.Item1.Piece, tuple.Item2.Piece))
+                    continue;
+
                 var value = (int)tuple.Item1.Piece.PieceType - (int)tuple.Item2.Piece.PieceType;
                 if ((minPositive == 0 || value < minPositive) && value > 0)
                 {
@@ -412,6 +415,15 @@ namespace Attack.Game
             }
         }
 
+        private bool IsSensibleAttack(PieceNode attaker, PieceNode defender)
+        {
+            if (attaker.Attacks(defender) == AttackResult.Victory)
+                return true;
+
+            Log.Debug($"Not a sensible attack {attaker.PieceType} => {defender.PieceType}");
+            return false;
+        }
+
         private bool DirectAttackExposed()
         {
             var friendlyNextToSpotted = GetTilesNextToExposed();
@@ -432,13 +444,11 @@ namespace Attack.Game
 
                     var targetPiece = _exposedEnemyTiles[target].Piece;
 
-                    if (selectedPiece.Attacks(targetPiece) == AttackResult.Victory)
+                    if (IsSensibleAttack(selectedPiece, targetPiece))
                     {
                         _board.PlayTurn(selectedTile.Position, Vector2I.Zero, target);
                         return true;
                     }
-
-                    Log.Debug($"Not a sensible attack {selectedPiece.PieceType} => {targetPiece.PieceType}");
                 }
 
                 Log.Debug("Out of exposed pieces to attack");
