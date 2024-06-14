@@ -89,7 +89,8 @@ namespace Attack.Game
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Failed to process AI player turn");
-                    GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
+
+                    EndGame(true);
                 }
 
 
@@ -331,14 +332,19 @@ namespace Attack.Game
             CanCompleteTurn = false;
         }
 
-        public void EndGame()
+        public void EndGame(bool surrender = false)
         {
-            Log.Information($"Game over - {CurrentTurn.TeamPlaying} wins!");
+
+            string message = surrender ?
+                $"{CurrentTurn.TeamPlaying} surrenders. {(CurrentTurn.TeamPlaying == Team.Red ? Team.Blue : Team.Red)} wins!" :
+                $"{CurrentTurn.TeamPlaying} wins!";
+
+            Log.Information($"Game over - {message}");
 
             _gameInstance.CompletedDate = DateTime.UtcNow;
             _sqlSaveManager.SaveGame(_gameInstance);
 
-            _notification.SendNotification($"{CurrentTurn.TeamPlaying} wins!");
+            _notification.SendNotification(message);
             NotificationShowing = true;
 
             GameOver = true;
