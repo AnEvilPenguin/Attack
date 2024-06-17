@@ -136,7 +136,6 @@ public partial class PieceNode : Node2D
         _material = _sprite.Material.Duplicate() as ShaderMaterial;
         _sprite.Material = _material;
 
-        setTooltipText();
         setShaderColor();
     }
 
@@ -150,10 +149,11 @@ public partial class PieceNode : Node2D
         Team = team;
         PieceType = pieceType;
 
-        setTooltipText();
-
-        if (Team == Team.Blue)
+        if (Team == Team.Blue) 
+        { 
             SetSprite();
+            setTooltipText();
+        }
     }
 
     private void SetSprite()
