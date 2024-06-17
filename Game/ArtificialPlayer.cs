@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Godot.Time;
@@ -93,6 +94,7 @@ namespace Attack.Game
             {
                 int shortestDistance = -1;
                 var closestEnemies = _enemyTiles.Values
+                    .Where(t => !t.Piece.Spotted || IsSensibleAttack(tile.Piece, t.Piece))
                     .OrderBy(t =>
                     {
                         var abs = tile.DistanceFromTile(t).Abs();
@@ -297,12 +299,13 @@ namespace Attack.Game
             {
                 var targets = getNeighboursAndTargets(tile, _enemyTiles.Values);
 
-                if (targets.Count > 0)
+                foreach (var tuple in targets)
                 {
-                    var first = targets.First();
+                    var destination = tuple.Item2;
+                    var attack = tuple.Item1;
 
-                    var destination = first.Item2;
-                    var attack = first.Item1;
+                    if (attack.Piece != null && attack.Piece.Spotted && !IsSensibleAttack(tile.Piece, attack.Piece))
+                        continue;
 
                     _board.PlayTurn(tile.Position, destination.Position, attack.Position);
                     return true;
@@ -325,7 +328,8 @@ namespace Attack.Game
 
                 foreach (var attackableTile in attackableExposed)
                 {
-                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                    if (IsSensibleAttack(tile.Piece, _exposedEnemyTiles[attackableTile].Piece))
+                        attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
                 }
             }
 
@@ -342,7 +346,8 @@ namespace Attack.Game
 
                 foreach (var attackableTile in attackableExposed)
                 {
-                    attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
+                    if (IsSensibleAttack(tile.Piece, _exposedEnemyTiles[attackableTile].Piece))
+                        attackableValues.Add(new Tuple<Tile, Tile>(tile, _exposedEnemyTiles[attackableTile]));
                 }
             }
 
@@ -359,6 +364,9 @@ namespace Attack.Game
 
             foreach (var tuple in attackableValues)
             {
+                if (!IsSensibleAttack(tuple.Item1.Piece, tuple.Item2.Piece))
+                    continue;
+
                 var value = (int)tuple.Item1.Piece.PieceType - (int)tuple.Item2.Piece.PieceType;
                 if ((minPositive == 0 || value < minPositive) && value > 0)
                 {
@@ -403,13 +411,20 @@ namespace Attack.Game
                 if (destination == Vector2I.Zero)
                     continue;
 
-                // doesn't matter if this is Zero or not
-                var attack = _emptyTiles[destination].GetNeighbours()
-                    .FirstOrDefault(n => _enemyTiles.ContainsKey(n));
-
-                _board.PlayTurn(tile.Position, destination, attack);
+                _board.PlayTurn(tile.Position, destination, Vector2I.Zero);
                 return;
             }
+
+            throw new Exception("Unable to find random move to make");
+        }
+
+        private bool IsSensibleAttack(PieceNode attaker, PieceNode defender)
+        {
+            if (attaker.Attacks(defender, true) == AttackResult.Victory)
+                return true;
+
+            Log.Debug($"Not a sensible attack {attaker.PieceType} => {defender.PieceType}");
+            return false;
         }
 
         private bool DirectAttackExposed()
@@ -432,13 +447,11 @@ namespace Attack.Game
 
                     var targetPiece = _exposedEnemyTiles[target].Piece;
 
-                    if (selectedPiece.Attacks(targetPiece) == AttackResult.Victory)
+                    if (IsSensibleAttack(selectedPiece, targetPiece))
                     {
                         _board.PlayTurn(selectedTile.Position, Vector2I.Zero, target);
                         return true;
                     }
-
-                    Log.Debug($"Not a sensible attack {selectedPiece.PieceType} => {targetPiece.PieceType}");
                 }
 
                 Log.Debug("Out of exposed pieces to attack");

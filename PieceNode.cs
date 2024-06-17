@@ -117,7 +117,6 @@ public partial class PieceNode : Node2D
 
             if (_spotted)
             {
-                // TODO Set shader to treat white as white to indicate the unit is spotted.
                 setTooltipText();
                 SetSprite();
                 _material.Set("shader_parameter/exposed", true);
@@ -137,7 +136,6 @@ public partial class PieceNode : Node2D
         _material = _sprite.Material.Duplicate() as ShaderMaterial;
         _sprite.Material = _material;
 
-        setTooltipText();
         setShaderColor();
     }
 
@@ -151,10 +149,11 @@ public partial class PieceNode : Node2D
         Team = team;
         PieceType = pieceType;
 
-        setTooltipText();
-
-        if (Team == Team.Blue)
+        if (Team == Team.Blue) 
+        { 
             SetSprite();
+            setTooltipText();
+        }
     }
 
     private void SetSprite()
@@ -245,13 +244,16 @@ public partial class PieceNode : Node2D
         }
     }
 
-    internal AttackResult Attacks(PieceNode defender)
+    internal AttackResult Attacks(PieceNode defender, bool testRun = false)
     {
         // TODO logic for showing icons and tooltips and the like (not here)
-        Spotted = true;
-        defender.Spotted = true;
+        if (!testRun)
+        {
+            Spotted = true;
+            defender.Spotted = true;
 
-        Log.Debug($"{PieceType} attacks {defender.PieceType}");
+            Log.Debug($"{PieceType} attacks {defender.PieceType}");
+        }
 
         switch (defender.PieceType)
         {

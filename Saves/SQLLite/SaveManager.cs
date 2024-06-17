@@ -88,6 +88,11 @@ namespace Attack.Saves.SQLLite
         public GameInstance LoadGame(int id) =>
             _saveGame.Load(id);
 
+        public List<GameInstance> ListLoadableGames() =>
+            _saveGame.GetAll()
+                .Where(g => g.CompletedDate == null)
+                .ToList();
+
         public void SaveGame(GameInstance game, Turn turn)
         {
             _saveTurn.Save(game, turn);

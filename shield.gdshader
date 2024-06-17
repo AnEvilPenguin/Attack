@@ -17,7 +17,7 @@ void fragment() {
 	// COLOR = vec4(input_color.r, input_color.b, input_color.g, input_color.a);
 	
 	if (input_color.g > 0.7 && !exposed) {
-		COLOR = vec4(0.7, 0.7, 0.7, 1.7);
+		COLOR = vec4(0.5, 0.5, 0.5, 1.0);
 	}
 	else if (input_color.a == 0.0 || input_color.g > 0.7) {
 		COLOR = input_color;
