@@ -204,7 +204,45 @@ namespace Attack.Saves.SQLLite
 
         public List<GameInstance> GetAll()
         {
-            throw new NotImplementedException();
+            Log.Information("Getting games");
+            List<int> ids = new List<int>();
+
+            List<GameInstance> instances = new List<GameInstance>();
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                command.CommandText =
+                    @"
+                        SELECT Id FROM Games
+                    ";
+
+                SqliteDataReader reader;
+
+                try
+                {
+                    reader = command.ExecuteReader();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Failed to read game ids");
+                    throw;
+                }
+
+                
+
+                while (reader.Read())
+                {
+                    ids.Add((int)(long)reader.GetValue(0));
+                }
+            }
+
+            ids.ForEach(i => instances.Add(Load(i)));
+
+            return instances;
         }
 
         public int GetLatestId()

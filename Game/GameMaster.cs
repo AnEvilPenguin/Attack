@@ -98,6 +98,9 @@ namespace Attack.Game
             }
         }
 
+        public List<GameInstance> ListLoadableGames() =>
+            _sqlSaveManager.ListLoadableGames();
+
         public bool CanLoadGames()
         {
             _latestGameId = _sqlSaveManager.GetLatestSaveId();
@@ -122,7 +125,7 @@ namespace Attack.Game
         {
             GameOver = false;
 
-            _gameInstance = _sqlSaveManager.LoadGame(_latestGameId);
+            _gameInstance = _sqlSaveManager.LoadGame(id);
 
             _initialPlacements = _sqlSaveManager.LoadPieces(_gameInstance);
             _protoTurns = _sqlSaveManager.LoadTurns(_gameInstance);
